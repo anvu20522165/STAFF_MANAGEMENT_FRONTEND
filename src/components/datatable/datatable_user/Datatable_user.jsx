@@ -18,7 +18,7 @@ import ReactPaginate from "react-paginate";
 const Datatable_user = () => {
 
   const [tableDataSVT, setTableDataSVT] = useState([]);
-
+  const [isAdmin, setIsAdmin] = useState(false);
   //Pagination
   const [svtPerPage, setSvtPerPage] = useState(4)
   const [CsvtPerPage, setCSvtPerPage] = useState(1)
@@ -47,6 +47,7 @@ const Datatable_user = () => {
           console.log("need to refresh token")
           window.location.replace("/login");
         }
+        setIsAdmin(decodedToken.isAdmin)
 
       } catch (error) {
         // Handle errors here
@@ -80,6 +81,10 @@ const Datatable_user = () => {
     navigate(`/users/${id}`);
   }
 
+  function addNewUser(id) {
+    navigate(`/users/add`);
+  }
+
   const deleteUser = async (id) => {
     const accessToken = await AsyncStorage.getItem("accessToken");
     console.log(id)
@@ -89,7 +94,10 @@ const Datatable_user = () => {
         console.log(response);
       })
       .catch((error) => {
-        console.log(error);
+        window.alert(
+          "You don't have the permission to fulfill this action"
+      );
+
       });
     loadSVT();
   };
@@ -100,8 +108,21 @@ const Datatable_user = () => {
       <div className={styles.datatable}>
         <div className={styles.datatableTitle}>
           <b>Danh Sách Nhân Viên</b>
-
         </div>
+
+        {isAdmin == true ? (
+          <div style={{ marginBottom: 10 }}>
+            <Button
+              onClick={() => addNewUser()}
+              style={{ background: "green", fontSize: 15, fontWeight: "bold" }}
+            >
+              Thêm NV
+            </Button>
+          </div>
+        ) : (
+          <div style={{ marginBottom: 10 }}>
+          </div>
+        )}
 
         <TableContainer component={Paper} className={styles.table}>
           <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
@@ -120,7 +141,7 @@ const Datatable_user = () => {
                   Email
                 </TableCell>
                 <TableCell className={styles.tableCell + ' text-center'}>
-                  SDT
+                  SĐT
                 </TableCell>
                 <TableCell className={styles.tableCell + ' text-center'}>
                   Ngày Sinh
@@ -145,7 +166,7 @@ const Datatable_user = () => {
                   </TableCell>
                   <TableCell className={styles.tableCell + ' text-center'}>
                     <img
-                    style={{width: 35, height: 35, borderRadius: 20}}
+                      style={{ width: 35, height: 35, borderRadius: 20 }}
                       src={item.avt}
                       alt=""
                       className="itemImg"
