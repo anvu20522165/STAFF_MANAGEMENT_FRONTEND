@@ -5,12 +5,9 @@ import { jwtDecode } from "jwt-decode"
 import { useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
-import Alert from '@mui/material/Alert';
 
 const Add = () => {
-  const { userId } = useParams(); //lấy id từ url
   const [username, setUsername] = useState(null)
   const [email, setEmail] = useState(null)
   const [password, setPassword] = useState("123")
@@ -21,7 +18,6 @@ const Add = () => {
       try {
 
         const accessToken = await AsyncStorage.getItem("accessToken");
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
         const decodedToken = jwtDecode(accessToken);
         let curTime = Date.now() / 1000;
         if (decodedToken.exp < curTime) {
@@ -44,12 +40,14 @@ const Add = () => {
         password: password,
       }
       axios
-        .post(`http://localhost:5000/v1/auth/register`, updatedUser)
+        .post(`http://localhost:5000/v1/auth/register`, updatedUser, { headers: { Authorization: `Bearer ${accessToken}` } })
         .then((response) => {
           window.location.replace(`/users`);
         })
         .catch((error) => {
-          console.log(error);
+          window.alert(
+            error.response.data
+        );
         });
     }
     else {
@@ -57,8 +55,6 @@ const Add = () => {
         "Username and Email shouldn't be empty!"
     );
     }
-    
-
   };
 
 
