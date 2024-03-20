@@ -1,0 +1,105 @@
+.buttonUpdate
+{
+    float:right;
+    margin-top: 5px;
+    margin-left: 30px;
+    margin-right: 10px;
+}
+.myButton {
+    width: 100px;
+    padding: 10px;
+    
+    border-radius: 10px;
+    background-color: teal;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.datatable {
+    height: 1100px;
+    padding: 20px;
+    margin-left: 20px;
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+}
+.datatable .datatableTitle {
+    width: 100%;
+    font-size: 24px;
+    color: rgb(97, 97, 97);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.datatable .datatableTitle .link {
+    text-decoration: none;
+    color: green;
+    font-size: 16px;
+    font-weight: 400;
+    border: 1px solid green;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.table .cellWrapper {
+    display: flex;
+    align-items: center;
+}
+
+
+.cellWithImg {
+    display: flex;
+    align-items: center;
+}
+.cellWithImg .cellImg {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    margin-left: 10px;
+}
+
+.myTable{
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 350px;
+    border-style: solid;
+  border-color: rgb(242, 234, 255);
+  box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+}
+
+.infos{
+    margin-bottom: 15px;
+}
+
+
+.infos{
+    font-size: 17px;
+    color: rgb(51, 51, 51);
+    margin: 10px;
+}
+
+
+
+.myContainerPagination{
+    display: flex;
+    padding: 10px;
+    color: rgb(62, 3, 117);
+    float: right;
+    
+    
+}
+
+.pageItem{
+    margin: 20px;
+    text-emphasis: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+

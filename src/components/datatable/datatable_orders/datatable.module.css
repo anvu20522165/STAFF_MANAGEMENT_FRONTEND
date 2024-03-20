@@ -1,0 +1,51 @@
+.datatable {
+    height: 600px;
+    padding: 20px;
+    margin-left: 20px;
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+}
+.datatable .datatableTitle {
+    width: 100%;
+    font-size: 24px;
+    color: rgb(97, 97, 97);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/* .datatable .datatableTitle .link {
+    text-decoration: none;
+    color: green;
+    font-size: 16px;
+    font-weight: 400;
+    border: 1px solid green;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+} */
+.table .cellWrapper {
+    display: flex;
+    align-items: center;
+}
+
+
+.table .cellAction {
+    display: flex;
+    align-items: center; 
+    gap: 5px;
+}
+
+.myContainerPagination{
+    display: flex;
+    padding: 10px;
+    color: rgb(62, 3, 117);
+    
+}
+
+.pageItem{
+    margin: 20px;
+    text-emphasis: none;
+    cursor: pointer;
+    text-decoration: none;
+    float: right;
+}
