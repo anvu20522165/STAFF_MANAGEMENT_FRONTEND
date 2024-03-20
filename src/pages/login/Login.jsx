@@ -1,9 +1,9 @@
 
 // export default Login;
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { jwtDecode } from "jwt-decode"
+import { useState, useEffect } from 'react';
 import axios from "axios";
-import { useState } from "react";
 import "./login.css";
 import { Link } from "react-router-dom";
 const Login = () => {
@@ -11,29 +11,29 @@ const Login = () => {
   const [password, setPassword] = useState("")
 
   //if token is still valid then redirect to home screen
-  // useEffect(() => {
-  //   async function checkAuth() {
-  //     try {
+  useEffect(() => {
+    async function checkAuth() {
+      try {
 
-  //       const accessToken = await AsyncStorage.getItem("accessToken");
-  //       const refreshToken = await AsyncStorage.getItem("refreshToken");
-  //       const decodedToken = jwtDecode(accessToken);
-  //       console.log(decodedToken)
-  //       let curTime = Date.now() / 1000;
-  //       if (decodedToken.exp > curTime) {
-  //         console.log("need to refresh token")
+        const accessToken = await AsyncStorage.getItem("accessToken");
+        const refreshToken = await AsyncStorage.getItem("refreshToken");
+        const decodedToken = jwtDecode(accessToken);
+        console.log(decodedToken)
+        let curTime = Date.now() / 1000;
+        if (decodedToken.exp > curTime) {
+          console.log("need to refresh token")
 
-  //             window.location.replace("/");
-  //       }
+              window.location.replace("/");
+        }
 
-  //     } catch (error) {
-  //       // Handle errors here
-  //       console.log("lỗi cmnr")
-  //     }
+      } catch (error) {
+        // Handle errors here
+        console.log("Vừa loggout hoặc hết hạn token")
+      }
 
-  //   }
-  //   checkAuth()
-  // }, [])
+    }
+    checkAuth()
+  }, [])
 
   const handleLogin = (event) => {
     event.preventDefault();
