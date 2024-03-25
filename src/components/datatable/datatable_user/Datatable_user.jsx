@@ -10,23 +10,59 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode"
 import { useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './datatable_user.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from "react-paginate";
-
+import queryString from 'query-string';
+import Select from 'react-select';
 const Datatable_user = () => {
+  const location = useLocation()
+  const params = queryString.parse(location.search);
+  const [username, setUsername] = useState(() => {
+    return params.username
+  });
+  const [position, setPosition] = useState(() => {
+    return params.position
+  });
 
+  const [department, setDepartment] = useState(() => {
+    return params.department
+  });
+  const [selectedPosition, setSelectedPosition] = useState({ value: 'QUAN_LY', label: 'Quản lý' });
+  const positions = [
+    { value: 'QUAN_LY', label: 'Quản lý' },
+    { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
+    { value: 'PHO_PHONG', label: 'Phó phòng' },
+    { value: 'NHAN_VIEN', label: 'Nhân viên' },
+  ];
+
+  const [selectedDepartment, setSelectedDepartment] = useState({ value: '', label: 'Tất cả' });
+  const departments = [
+    { value: '', label: 'Tất cả' },
+    { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
+    { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
+    { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
+    { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
+    { value: 'PHONG_MARKETING', label: 'Phòng Marketing' },
+    { value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' },
+    { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
+    { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
+
+  ];
+
+  const [email, setEmail] = useState(() => {
+    return params.email
+  });
   const [tableDataSVT, setTableDataSVT] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+
   //Pagination
-  const [svtPerPage, setSvtPerPage] = useState(4)
+  const [svtPerPage, setSvtPerPage] = useState(6)
   const [CsvtPerPage, setCSvtPerPage] = useState(1)
   const numOfToTalPages = Math.ceil(tableDataSVT?.length / svtPerPage);
-  // const pages = [...Array(numOfToTalPages + 1).keys()].slice(1);
   const indexOfLastSVT = CsvtPerPage * svtPerPage;
   const indexOfFirstSVT = indexOfLastSVT - svtPerPage;
-  // const visibleSVT = tableDataSVT.data?.slice(indexOfFirstSVT, indexOfLastSVT)
   const visibleSVT = tableDataSVT?.slice(indexOfFirstSVT, indexOfLastSVT)
 
   const navigate = useNavigate();
@@ -37,9 +73,7 @@ const Datatable_user = () => {
   useEffect(() => {
     async function checkAuth() {
       try {
-
         const accessToken = await AsyncStorage.getItem("accessToken");
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
         const decodedToken = jwtDecode(accessToken);
         console.log(decodedToken)
         let curTime = Date.now() / 1000;
@@ -63,19 +97,61 @@ const Datatable_user = () => {
     loadSVT();
   }, []);
 
+  function buildSearchURL() {
+    const searchData = {
+      usernameSearch: username || '',
+      emailSearch: email || '',
+      position: position || '',
+      department: department || '',
+    }
+    let url = `http://localhost:5000/v1/user/users?`
+
+    //check username
+    if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== "undefined") {
+      url = url + `username=${searchData.usernameSearch}`
+    }
+    else {
+      url = url + `username=`
+      setUsername('')
+    }
+
+    //check email
+    if (searchData.emailSearch !== undefined && searchData.emailSearch !== "undefined") {
+      url = url + `&email=${searchData.emailSearch}`
+    }
+    else {
+      url = url + `&email=`
+      setEmail('')
+    }
+    //check position  
+    url = url + `&position=${searchData.position}`
+
+    //check department  
+    url = url + `&department=${searchData.department}`
+
+    return url;
+  }
+
   const loadSVT = async () => {
     const accessToken = await AsyncStorage.getItem("accessToken");
-    console.log(accessToken)
+    const url = buildSearchURL();
+    console.log(url)
     axios
-      .get('http://localhost:5000/v1/user/users', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((response) => {
+        console.log(response.data);
         setTableDataSVT(response.data);
-        console.log("all users:", response.data);
       })
       .catch((error) => {
         console.log(error);
       });
+    //}
+
   };
+
+  function search() {
+    window.location.replace(`/users?username=${username}&email=${email}&position=${selectedPosition.value}&department=${selectedDepartment.value}`);
+  }
 
   function editUser(id) {
     navigate(`/users/${id}`);
@@ -96,7 +172,7 @@ const Datatable_user = () => {
       .catch((error) => {
         window.alert(
           "You don't have the permission to fulfill this action"
-      );
+        );
 
       });
     loadSVT();
@@ -109,7 +185,74 @@ const Datatable_user = () => {
         <div className={styles.datatableTitle}>
           <b>Danh Sách Nhân Viên</b>
         </div>
+        <div className="item">
 
+          <div className={styles.details}>
+            <div className={styles.detailItems}>
+              <div className="itemKey">Tên:</div>
+              <div className="itemValue">
+                <input
+                  style={{
+                    padding: 10,
+                    borderColor: "#D0D0D0",
+                    borderWidth: 2,
+                    marginTop: 5,
+                    marginLeft: 5,
+                    borderRadius: 5,
+                    fontSize: 15,
+                    marginRight: 30,
+                    width: 200
+                  }}
+                  value={username}
+                  type="text" placeholder="Nhập username"
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="itemKey">Email:</div>
+              <div className="itemValue">
+                <input
+                  style={{
+                    padding: 10,
+                    borderColor: "#D0D0D0",
+                    borderWidth: 2,
+                    marginTop: 5,
+                    marginLeft: 5,
+                    borderRadius: 5,
+                    fontSize: 15,
+                    marginRight: 30,
+                    width: 200
+
+                  }}
+                  value={email}
+                  type="text" placeholder="Nhập email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="itemKey">Chức vụ:</div>
+              <div className="itemValue" style={{ marginLeft: 10 }}>
+                <Select
+                  defaultValue={selectedPosition}
+                  onChange={setSelectedPosition}
+                  options={positions}
+
+                />
+              </div>
+
+              <div className="itemKey" style={{ marginLeft: 50 }}>Phòng ban:</div>
+              <div className="itemValue" style={{ marginLeft: 10 }}>
+                <Select
+                  defaultValue={selectedDepartment}
+                  onChange={setSelectedDepartment}
+                  options={departments}
+
+                />
+                <Button onClick={() => search()} style={{ borderRadius: 5, background: "rgb(98, 192, 216)", }}> Tìm kiếm </Button>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
         {isAdmin == true ? (
           <div style={{ marginBottom: 10 }}>
             <Button
@@ -150,6 +293,9 @@ const Datatable_user = () => {
                   Giới Tính
                 </TableCell>
                 <TableCell className={styles.tableCell + ' text-center'}>
+                  Chức vụ
+                </TableCell>
+                <TableCell className={styles.tableCell + ' text-center'}>
                   Lựa Chọn
 
                 </TableCell>
@@ -186,6 +332,9 @@ const Datatable_user = () => {
                   </TableCell>
                   <TableCell className={styles.tableCell + ' text-center'}>
                     {item.gender}
+                  </TableCell>
+                  <TableCell className={styles.tableCell + ' text-center'}>
+                    {item.positions}
                   </TableCell>
                   <TableCell className={styles.tableCell + ' text-center'}>
                     <div className={styles.cellAction}>

@@ -58,21 +58,17 @@ const Home = () => {
       <Sidebar />
       <div className="homeContainer">
         <Navbar />
-        {/* <div className="widgets">
+        <div className="widgets">
           <Widget type="user" />
-          <Widget type="order" />
-          <Widget type="cinema" />
-          <Widget type="earning" />
-          
-        </div> */}
-        {/* <div className="charts">
-          <Featured />
-          <Chart title="Last 6 Months (Revenue)" aspect={2 / 1} />
+          <Widget type="requests" />
+
+
         </div>
-        <div className="listContainer">
-          <div className="listTitle">Đặt vé gần nhất</div>
-          <Table />
-        </div> */}
+        <div className="charts">
+          <Featured />
+          <Chart title="Lịch cá nhân" aspect={2 / 1} />
+        </div>
+
       </div>
     </div>
   );

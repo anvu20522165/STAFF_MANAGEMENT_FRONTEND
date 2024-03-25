@@ -49,7 +49,7 @@ const Featured = () => {
   return (
     <div className="featured">
       <div className="top">
-        <h1 className="title">Đánh giá doanh thu</h1>
+        <h1 className="title">Cuộc họp chung sắp tới</h1>
         <MoreVertIcon fontSize="small" />
       </div>
       <div className="bottom">
@@ -63,7 +63,7 @@ const Featured = () => {
         </p>
         <div className="summary">
           <div className="item">
-            <div className="itemTitle">Mục tiêu</div>
+            <div className="itemTitle">Phòng</div>
             <div className="itemResult positive">
              
               <div className="resultAmount">{targetMoney?.toLocaleString('vi', {style : 'currency', currency : 'VND'})}</div>

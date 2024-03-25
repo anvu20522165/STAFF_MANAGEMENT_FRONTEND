@@ -3,13 +3,13 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import { Link } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext } from "react";
-
+import HomeIcon from '@mui/icons-material/Home';
 const Sidebar = () => {
   const { dispatch } = useContext(DarkModeContext);
 
@@ -52,6 +52,18 @@ const Sidebar = () => {
             <li>
               <PersonOutlineIcon className="icon" />
               <span>Nhân viên</span>
+            </li>
+          </Link>
+          <Link to="/users" style={{ textDecoration: "none" }}>
+            <li>
+              <AssignmentIndIcon className="icon" />
+              <span>Chức vụ</span>
+            </li>
+          </Link>
+          <Link to="/users" style={{ textDecoration: "none" }}>
+            <li>
+              <HomeIcon className="icon" />
+              <span>Phòng ban</span>
             </li>
           </Link>
           
