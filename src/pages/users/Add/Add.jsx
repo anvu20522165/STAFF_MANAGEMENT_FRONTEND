@@ -6,17 +6,51 @@ import { useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
+import Select from 'react-select';
+import DatePicker from "react-datepicker";
 
+import "react-datepicker/dist/react-datepicker.css";
 const Add = () => {
   const [username, setUsername] = useState(null)
+  const [fullname, setFullname] = useState("")
   const [email, setEmail] = useState(null)
+  const [birth, setBirth] = useState(new Date())
+  const [gender, setGender] = useState({ value: 'MALE', label: 'Nam' },)
+  const [phone, setPhone] = useState("")
+  const [position, setPosition] = useState({ value: 'NHAN_VIEN', label: 'Nhân viên' },)
+  const [department, setDepartment] = useState({ value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' })
   const [password, setPassword] = useState("123")
 
+
+  const positions = [
+    { value: 'QUAN_LY', label: 'Quản lý' },
+    { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
+    { value: 'PHO_PHONG', label: 'Phó phòng' },
+    { value: 'NHAN_VIEN', label: 'Nhân viên' },
+  ];
+
+  const genders = [
+    { value: 'MALE', label: 'Nam' },
+    { value: 'FEMALE', label: 'Nữ' },
+
+  ]
+
+  const departments = [
+    { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
+    { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
+    { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
+    { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
+    { value: 'PHONG_MARKETING', label: 'Phòng Marketing' },
+    { value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' },
+    { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
+    { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
+
+  ];
 
   useEffect(() => {
     async function checkAuth() {
       try {
-
+        console.log(birth)
         const accessToken = await AsyncStorage.getItem("accessToken");
         const decodedToken = jwtDecode(accessToken);
         let curTime = Date.now() / 1000;
@@ -33,12 +67,21 @@ const Add = () => {
 
   const create = async () => {
     const accessToken = await AsyncStorage.getItem("accessToken");
-    if (username != null && email!=null) {
+    console.log(birth)
+    if (username != null && email != null) {
       const updatedUser = {
         username: username,
-        email: email,
+        fullname: fullname,
         password: password,
+        email: email,
+        phone: phone,
+        gender: gender.value,
+        birth: birth,
+        position: position.value,
+        department: department.value,
       }
+
+      console.log(updatedUser)
       axios
         .post(`http://localhost:5000/v1/auth/register`, updatedUser, { headers: { Authorization: `Bearer ${accessToken}` } })
         .then((response) => {
@@ -47,13 +90,13 @@ const Add = () => {
         .catch((error) => {
           window.alert(
             error.response.data
-        );
+          );
         });
     }
     else {
       window.alert(
         "Username and Email shouldn't be empty!"
-    );
+      );
     }
   };
 
@@ -69,7 +112,7 @@ const Add = () => {
             <div className="item">
               <div className="details">
                 <div className="detailItem">
-                  <div className="itemKey">Tên:</div>
+                  <div className="itemKey">Username:</div>
                   <div className="itemValue">
                     <input
                       style={{
@@ -83,6 +126,41 @@ const Add = () => {
                       }}
                       type="text" placeholder="Enter your username"
                       onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                  <div className="itemKey">Mật khẩu:</div>
+                  <div className="itemValue">
+                    <input
+                      style={{
+                        padding: 10,
+                        borderColor: "#D0D0D0",
+                        borderWidth: 2,
+                        marginTop: 5,
+                        marginLeft: 5,
+                        borderRadius: 5,
+                        fontSize: 15
+                      }}
+                      value={password}
+                      type="text" placeholder="Enter your password"
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="detailItem">
+                  <div className="itemKey">Họ tên:</div>
+                  <div className="itemValue">
+                    <input
+                      style={{
+                        padding: 10,
+                        borderColor: "#D0D0D0",
+                        borderWidth: 2,
+                        marginTop: 5,
+                        marginLeft: 5,
+                        borderRadius: 5,
+                        fontSize: 15
+                      }}
+                      type="text" placeholder="Enter your name"
+                      onChange={(e) => setFullname(e.target.value)}
                     />
                   </div>
                   <div className="itemKey">Mật khẩu:</div>
@@ -135,27 +213,63 @@ const Add = () => {
                         fontSize: 15
                       }}
                       type="text" placeholder="Enter your phone"
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="detailItem">
-                  <div className="itemKey">Ngày sinh:</div>
+                  <div className="itemKey">Ngày sinh (MM-DD-YYYY):</div>
                   <div className="itemValue">
-                    <input
-                      style={{
-                        padding: 10,
-                        borderColor: "#D0D0D0",
-                        borderWidth: 2,
-                        marginTop: 5,
-                        marginLeft: 5,
-                        borderRadius: 5,
-                        fontSize: 15
-                      }}
-                      type="text" placeholder="Enter your birth"
-                      onChange={(e) => setEmail(e.target.value)}
+                    {/* <DatePicker selected={birth} onChange={(date) => setBirth(date)} /> */}
+                    <DatePicker
+                      // defaultValue={birth}
+                      // selected={birth}
+                      // onChange={setBirth}
+                      // showTimeSelect
+                      // dateFormat="Pp"
+
+                      selected={birth}
+                      onChange={(date) => setBirth(date)}
+                      timeInputLabel="Time:"
+                      dateFormat="MM/dd/yyyy h:mm aa"
+                      showTimeInput
+                      showMonthDropdown
+                      showYearDropdown
+                      scrollableYearDropdown
                     />
                   </div>
+                </div>
+                <div className="detailItem">
+                  <div className="itemKey">Giới tính:</div>
+                  <div className="itemValue">
+                    <Select
+                      defaultValue={gender}
+                      onChange={setGender}
+                      options={genders}
+                    />
+                  </div>
+                </div>
+                <div className="detailItem">
+                  <div className="itemKey">Phòng ban:</div>
+                  <div className="itemValue">
+                    <Select
+                      defaultValue={department}
+                      onChange={setDepartment}
+                      options={departments}
+                    />
+                  </div>
+                </div>
+                <div className="detailItem">
+                  <div className="itemKey">Chức vụ:</div>
+                  <div className="itemValue">
+                    <Select
+                      defaultValue={position}
+                      onChange={setPosition}
+                      options={positions}
+                    />
+
+                  </div>
+
                 </div>
 
                 <Button onClick={() => create()} style={{ borderRadius: 5, background: "green" }}> Thêm </Button>

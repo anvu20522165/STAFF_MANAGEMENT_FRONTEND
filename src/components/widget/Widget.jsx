@@ -3,9 +3,12 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import TheatersIcon from '@mui/icons-material/Theaters';
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from 'axios';
+import { jwtDecode } from "jwt-decode"
+import { useState, useEffect } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link } from "react-router-dom";
+
 const Widget = ({ type }) => {
   
   let data;
@@ -13,63 +16,23 @@ const Widget = ({ type }) => {
 //userNumber
   const [userNumber, setUserNumber] = useState([]);
   const loadUserNumber = async () => {
+    const accessToken = await AsyncStorage.getItem("accessToken");
+    console.log(accessToken)
     axios
-      .get("https://uitcinema.devhungops.website/api/statistics/countUser")
+      .get('http://localhost:5000/v1/user/users', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((response) => {
-        setUserNumber(response.data);
-        //console.log(response.data);
+        setUserNumber(response.data.length);
+        console.log("all users:", response.data.length);
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-//orders
-const [orderNumber, setOrderNumber] = useState([]);
-const loadUsOrderNumber = async () => {
-  axios
-    .get("https://uitcinema.devhungops.website/api/statistics/getCountTicket")
-    .then((response) => {
-      setOrderNumber(response.data);
-      //console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
 
-//cinemaNumbers
-const [cinemaNumber, setCinemaNumber] = useState([]);
-const loadCinemaNumber = async () => {
-  axios
-    .get("https://uitcinema.devhungops.website/api/statistics/getCountCinema")
-    .then((response) => {
-      setCinemaNumber(response.data);
-      //console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-//earning 
-const [earning, setEarning] = useState([]);
-const loadEarning = async () => {
-  axios
-    .get("https://uitcinema.devhungops.website/api/statistics/getTotalAllTime")
-    .then((response) => {
-      setEarning(response.data);
-      console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
 
   useEffect(() => {
     loadUserNumber();
-    loadCinemaNumber();
-    loadUsOrderNumber();
-    loadEarning();
     
   }, []);
   switch (type) {
@@ -79,7 +42,7 @@ const loadEarning = async () => {
         isMoney: false,
         link: "Xem người dùng",
         directLink: "/users",
-        value: userNumber.CountUser,
+        value: userNumber,
         icon: (
           <PersonOutlinedIcon
             className="icon"
@@ -91,13 +54,13 @@ const loadEarning = async () => {
         ),
       };
       break;
-    case "order":
+    case "requests":
       data = {
-        title: "Đặt vé",
+        title: "Yêu cầu",
         isMoney: false,
-        link: "Xem các vé",
+        link: "Xem các yêu cầu",
         directLink: "/orders",
-        value: orderNumber.CountTicket,
+        value: 120,
         icon: (
           <ShoppingCartOutlinedIcon
             className="icon"
@@ -109,39 +72,39 @@ const loadEarning = async () => {
         ),
       };
       break;
-    case "earning":
-      data = {
-        title: "Doanh thu",
-        isMoney: true,
-        link: "Kiểm tra",
-        directLink: "/orders",
-        value: earning.TotalAllTime?.toLocaleString('vi', {style : 'currency', currency : 'VND'}),
-        icon: (
-          <MonetizationOnOutlinedIcon
-            className="icon"
-            style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
-          />
-        ),
-      };
-      break;
-    case "cinema":
-      data = {
-        title: "Rạp chiếu",
-        isMoney: false,
-        link: "Xem các rạp",
-        directLink: "/cinemas",
-        value: cinemaNumber.CountCinema,
-        icon: (
-          <TheatersIcon
-            className="icon"
-            style={{
-              backgroundColor: "rgba(128, 0, 128, 0.2)",
-              color: "purple",
-            }}
-          />
-        ),
-      };
-      break;
+    // case "earning":
+    //   data = {
+    //     title: "Doanh thu",
+    //     isMoney: true,
+    //     link: "Kiểm tra",
+    //     directLink: "/orders",
+    //     value: earning.TotalAllTime?.toLocaleString('vi', {style : 'currency', currency : 'VND'}),
+    //     icon: (
+    //       <MonetizationOnOutlinedIcon
+    //         className="icon"
+    //         style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
+    //       />
+    //     ),
+    //   };
+    //   break;
+    // case "cinema":
+    //   data = {
+    //     title: "Rạp chiếu",
+    //     isMoney: false,
+    //     link: "Xem các rạp",
+    //     directLink: "/cinemas",
+    //     value: cinemaNumber.CountCinema,
+    //     icon: (
+    //       <TheatersIcon
+    //         className="icon"
+    //         style={{
+    //           backgroundColor: "rgba(128, 0, 128, 0.2)",
+    //           color: "purple",
+    //         }}
+    //       />
+    //     ),
+    //   };
+    // break;
     default:
       break;
   }
