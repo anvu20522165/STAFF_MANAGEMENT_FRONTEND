@@ -83,7 +83,7 @@ const Add = () => {
 
       console.log(updatedUser)
       axios
-        .post(`http://localhost:5000/v1/auth/register`, updatedUser, { headers: { Authorization: `Bearer ${accessToken}` } })
+        .post(`http://localhost:5555/v1/auth/register`, updatedUser, { headers: { Authorization: `Bearer ${accessToken}` } })
         .then((response) => {
           window.location.replace(`/users`);
         })
