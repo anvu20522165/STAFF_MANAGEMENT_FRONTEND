@@ -104,7 +104,7 @@ const Datatable_user = () => {
       position: position || '',
       department: department || '',
     }
-    let url = `http://localhost:5000/v1/user/users?`
+    let url = `http://localhost:5555/v1/user/users?`
 
     //check username
     if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== "undefined") {
@@ -165,7 +165,7 @@ const Datatable_user = () => {
     const accessToken = await AsyncStorage.getItem("accessToken");
     console.log(id)
     axios
-      .delete(`http://localhost:5000/v1/user/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+      .delete(`http://localhost:5555/v1/user/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((response) => {
         console.log(response);
       })
