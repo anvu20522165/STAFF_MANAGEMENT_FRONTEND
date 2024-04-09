@@ -1,54 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import "./Announcement.scss"
-import Navbar from "../../components/navbar/Navbar"
-import Sidebar from "../../components/sidebar/Sidebar"
-
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import axios from 'axios';
+import styles from '../../components/datatable/datatable_user/datatable_user.module.css';
+import Button from 'react-bootstrap/Button';
+import ReactPaginate from 'react-paginate';
+import Sidebar from '../../components/sidebar/Sidebar';
+import Navbar from '../../components/navbar/Navbar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 
 const Announcement = () => {
-    const [announcements, setAnnouncements] = useState([]);
+    const [tableData, setTableData] = useState([]);
+    const [perPage, setPerPage] = useState(6);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [numOfTotalPages, setNumOfTotalPages] = useState(0);
+
+    const loadAnnouncements = async () => {
+        try {
+            const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements');
+            setTableData(response.data);
+            console.log('aaa', response.data);
+            setNumOfTotalPages(Math.ceil(response.data.length / perPage));
+        } catch (error) {
+            console.log(error.response.data);
+        }
+    };
+
     useEffect(() => {
-        // Lấy dữ liệu từ backend
-        fetch('/announcement/get-all-announcements')
-          .then(response => response.json())
-          .then(data => setAnnouncements(data))
-          .catch(error => console.error('Error:', error));
+        loadAnnouncements();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handlePageChange = ({ selected }) => {
+        setCurrentPage(selected + 1);
+    };
+
+    const indexOfLastAnnouncement = currentPage * perPage;
+    const indexOfFirstAnnouncement = indexOfLastAnnouncement - perPage;
+    const visibleAnnouncements = tableData?.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
+
     return (
         <div className="home">
             <Sidebar />
             <div className="homeContainer">
                 <Navbar />
-                <div className="datatable">
-                    <div className="datatableTitle">
-                        <b>Lịch Biểu</b>
+                <div className={styles.servicePage}>
+                    <div className={styles.datatable}>
+                        <div className={styles.datatableTitle}>
+                            <b>Lịch Biểu</b>
+                        </div>
+
+                        <TableContainer component={Paper} className={styles.table}>
+                            <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            Tên thông báo
+                                        </TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            Ngày bắt đầu
+                                        </TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>Ghi chú</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>Nhân viên</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>Phòng ban</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {visibleAnnouncements?.length > 0 &&
+                                        visibleAnnouncements?.map((announcement, index) => (
+                                            <TableRow
+                                                key={index}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {index + 1}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {announcement.nameAnnouncement}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {new Date(announcement.startAt).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {announcement.note}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {announcement.listEmployee.join(', ')}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {announcement.department}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <ReactPaginate
+                            previousLabel={'Prev'}
+                            nextLabel={'Next'}
+                            pageCount={numOfTotalPages}
+                            onPageChange={handlePageChange}
+                            containerClassName={styles.myContainerPagination}
+                            pageClassName={styles.pageItem}
+                            pageLinkClassName={styles.pageLink}
+                            previousClassName={styles.pageItem}
+                            previousLinkClassName={styles.pageLink}
+                            nextClassName={styles.pageItem}
+                            nextLinkClassName={styles.pageLink}
+                            breakClassName={styles.pageItem}
+                            breakLinkClassName={styles.pageLink}
+                            activeClassName={styles.active}
+                        />
                     </div>
-                    <table className="announcementTable">
-                        <thead>
-                            <tr>
-                                <th>Tên thông báo</th>
-                                <th>Ngày bắt đầu</th>
-                                <th>Ghi chú</th>
-                                <th>Nhân viên</th>
-                                <th>Phòng ban</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {announcements.map(announcement => (
-                            <tr key={announcement._id}>
-                                <td>{announcement.nameAnnouncement}</td>
-                                <td>{new Date(announcement.startAt).toLocaleDateString()}</td>
-                                <td>{announcement.note}</td>
-                                <td>{announcement.listEmployee.join(', ')}</td>
-                                <td>{announcement.department}</td>
-                            </tr>
-                            ))}
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Announcement;
