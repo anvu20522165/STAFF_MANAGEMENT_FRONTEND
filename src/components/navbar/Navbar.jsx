@@ -12,7 +12,7 @@ const Navbar = () => {
     useEffect(() => {
         async function checkAuth() {
             try {
-                const accessToken = await AsyncStorage.getItem('accessToken');
+                const accessToken = await AsyncStorage.getItem('access_token');
                 const refreshToken = await AsyncStorage.getItem('refreshToken');
                 const decodedToken = jwtDecode(accessToken);
                 // console.log(decodedToken)

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -14,16 +14,26 @@ import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { appContext } from '../../context/authenticated';
 
 const Announcement = () => {
     const [tableData, setTableData] = useState([]);
     const [perPage, setPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
+    const { isAuth } = useContext(appContext);
+    console.log(isAuth);
     const [numOfTotalPages, setNumOfTotalPages] = useState(0);
 
     const loadAnnouncements = async () => {
         try {
-            const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements');
+            const accessToken = await AsyncStorage.getItem('accessToken'); // Lấy accessToken từ AsyncStorage
+
+            const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements', {
+                headers: {
+                    Authorization: `Bearer ${isAuth}`,
+                },
+            });
+
             setTableData(response.data);
             console.log('aaa', response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
