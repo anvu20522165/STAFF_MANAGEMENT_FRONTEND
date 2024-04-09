@@ -8,20 +8,15 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
 import styles from '../../components/datatable/datatable_user/datatable_user.module.css';
-import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
-import { appContext } from '../../context/authenticated';
 
 const Announcement = () => {
     const [tableData, setTableData] = useState([]);
     const [perPage, setPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
-    const { isAuth } = useContext(appContext);
-    console.log(isAuth);
     const [numOfTotalPages, setNumOfTotalPages] = useState(0);
 
     const loadAnnouncements = async () => {
@@ -30,7 +25,7 @@ const Announcement = () => {
 
             const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements', {
                 headers: {
-                    Authorization: `Bearer ${isAuth}`,
+                    Authorization: `Bearer ${accessToken}`,
                 },
             });
 

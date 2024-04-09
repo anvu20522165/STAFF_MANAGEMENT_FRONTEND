@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './login.css';
 import { Link } from 'react-router-dom';
-import { setAccessToken } from '../../Utils/Auth';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -43,9 +42,8 @@ const Login = () => {
             .then((response) => {
                 console.log(response.data);
                 const accessToken = response.data.accessToken;
-                setAccessToken(accessToken);
                 // console.log(accessToken);
-                // AsyncStorage.setItem("accessToken", accessToken);
+                AsyncStorage.setItem('accessToken', accessToken);
                 AsyncStorage.setItem('refreshToken', response.data.refreshToken);
                 // AsyncStorage.setItem("isAdmin", response.data.isAdmin);
 
