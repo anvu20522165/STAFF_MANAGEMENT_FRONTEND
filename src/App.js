@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import List_user from "./pages/list/list_users/List_user";
 import List_order from "./pages/order/List_order";
+import Announcement from "./pages/announcement/Announcement"
 import MakeCalendar from "./pages/calendars/makeCalendar";
 import Feedback from "./pages/feedback/feedback";
 import NewFeedBack from "./pages/feedback/NewFeedbacks";
@@ -22,6 +23,11 @@ function App() {
         <Routes>
           <Route path="/">
             <Route index element={<Home />} />
+
+            <Route path="announcement">
+              <Route index element={<Announcement />} />
+            </Route>
+
             <Route path="users">
               <Route index element={<List_user />} />
               <Route path=":userId" element={<Single />} />

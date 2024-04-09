@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/Feedback";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Link } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext } from "react";
@@ -45,6 +46,13 @@ const Sidebar = () => {
             <Link to="/" style={{ textDecoration: "none" }}>
               <DashboardIcon className="icon" />
               <span>Dashboard</span>
+            </Link>
+          </li>
+          <p className="title">Trang Quản Trị</p>
+          <li>
+            <Link to="/announcement" style={{ textDecoration: "none" }}>
+              <AssignmentIcon className="icon" />
+              <span>Annoucement</span>
             </Link>
           </li>
           <p className="title">Danh Sách</p>
