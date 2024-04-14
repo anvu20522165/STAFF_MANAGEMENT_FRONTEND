@@ -22,10 +22,16 @@ import styles from '../../components/datatable/datatable_user/datatable_user.mod
 import ReactPaginate from 'react-paginate';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
+import CustomSnackbar from '../../components/customSnackbar/CustomSnackbar';
+import './Announcement.scss';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 
 const Announcement = () => {
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [tableData, setTableData] = useState([]);
     const [perPage, setPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,8 +40,25 @@ const Announcement = () => {
     const [employees, setEmployees] = useState([]);
     const [selectedEmployees, setSelectedEmployees] = useState([]);
     const [userPosition, setUserPosition] = useState('');
-
+    const [editAnnouncement, setEditAnnouncement] = useState(null);
+    const [actionType, setActionType] = useState('add');
     const [open, setOpen] = useState(false);
+    const [isViewMode, setIsViewMode] = useState(false);
+
+    let [visibleAnnouncements, setVisibleAnnouncements] = useState([]);
+
+    const handleSnackbarOpen = (message, severity) => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setOpenSnackbar(true);
+    };
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
 
     const loadAnnouncements = async () => {
         try {
@@ -46,8 +69,6 @@ const Announcement = () => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-
-            console.log(response.data);
             setTableData(response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
         } catch (error) {
@@ -104,12 +125,47 @@ const Announcement = () => {
         setCurrentPage(selected + 1);
     };
 
-    const handleClickOpen = () => {
+    const handleClickOpen = (type, announcement = null) => {
+        if (type === 'edit' && announcement) {
+            setFormData({
+                nameAnnouncement: announcement.nameAnnouncement || '',
+                startAt: announcement.startAt || '',
+                note: announcement.note || '',
+                listEmployee: announcement.listEmployee || '',
+            });
+            setSelectedEmployees([]);
+            setEditAnnouncement(announcement);
+            setActionType('edit');
+        } else if (type === 'view' && announcement) {
+            setFormData({
+                nameAnnouncement: announcement.nameAnnouncement || '',
+                startAt: announcement.startAt || '',
+                note: announcement.note || '',
+                listEmployee: announcement.listEmployee ? announcement.listEmployee.join(', ') : '',
+                department: announcement.department || '',
+            });
+            setSelectedEmployees(announcement.listEmployee || []);
+            setEditAnnouncement(null);
+            setActionType('view');
+            setIsViewMode(true);
+        } else {
+            setFormData({
+                nameAnnouncement: '',
+                startAt: '',
+                note: '',
+                listEmployee: '',
+                department: '',
+            });
+            setSelectedEmployees([]);
+            setActionType('add');
+        }
         setOpen(true);
     };
 
     const handleClose = () => {
         setOpen(false);
+        setEditAnnouncement(null);
+        setActionType('add');
     };
 
     const [formData, setFormData] = useState({
@@ -117,7 +173,6 @@ const Announcement = () => {
         startAt: '',
         note: '',
         listEmployee: '',
-        department: '',
     });
 
     const handleChange = (e) => {
@@ -132,22 +187,66 @@ const Announcement = () => {
         e.preventDefault();
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            await axios.post('http://localhost:5555/v1/announcement', formData, {
+            if (actionType === 'add') {
+                await axios.post('http://localhost:5555/v1/announcement', formData, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            } else if (actionType === 'edit') {
+                await axios.put(`http://localhost:5555/v1/announcement/${editAnnouncement._id}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+            handleClose(); // Đóng dialog sau khi thêm mới hoặc cập nhật thành công
+            loadAnnouncements();
+            handleSnackbarOpen(actionType === 'add' ? 'Thêm mới thành công!' : 'Cập nhật thành công!', 'success');
+        } catch (error) {
+            console.log(error.response.data);
+            handleSnackbarOpen('Đã có lỗi xảy ra. Vui lòng thử lại sau.', 'error');
+        }
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            await axios.put(`http://localhost:5555/v1/announcement/${editAnnouncement._id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            setFormData({
-                nameAnnouncement: '',
-                startAt: '',
-                note: '',
-                listEmployee: '',
-                department: '',
-            });
-            setOpen(false); // Ẩn form
-            loadAnnouncements(); // Cập nhật dữ liệu
+            setOpen(false);
+            loadAnnouncements();
+            handleSnackbarOpen('Cập nhật thành công!', 'success');
         } catch (error) {
             console.log(error.response.data);
+            handleSnackbarOpen('cập nhật thất bại!', 'error');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken'); // Hoặc cách lấy token của bạn
+            const response = await axios.delete(`http://localhost:5555/v1/announcement/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            if (response.status === 200) {
+                setVisibleAnnouncements((prevAnnouncements) =>
+                    prevAnnouncements.filter((announcement) => announcement._id !== id),
+                );
+                handleSnackbarOpen('Hoàn thành công việc!', 'success');
+            }
+            loadAnnouncements();
+        } catch (error) {
+            console.error('Lỗi khi xóa announcement:', error);
+            alert('Đã có lỗi xảy ra khi xóa announcement. Vui lòng thử lại sau.');
+            handleSnackbarOpen('Đã có lỗi xảy ra khi xóa announcement. Vui lòng thử lại sau.', 'error');
         }
     };
 
@@ -170,11 +269,17 @@ const Announcement = () => {
 
     const indexOfLastAnnouncement = currentPage * perPage;
     const indexOfFirstAnnouncement = indexOfLastAnnouncement - perPage;
-    const visibleAnnouncements = tableData?.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
+    visibleAnnouncements = tableData?.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
 
     return (
         <div className="home">
             <Sidebar />
+            <CustomSnackbar
+                open={openSnackbar}
+                message={snackbarMessage}
+                severity={snackbarSeverity}
+                onClose={handleSnackbarClose}
+            />
             <div className="homeContainer">
                 <Navbar />
                 <div className={styles.servicePage}>
@@ -193,9 +298,18 @@ const Announcement = () => {
                         </div>
 
                         <Dialog open={open} onClose={handleClose}>
-                            <DialogTitle>Thêm mới lịch họp</DialogTitle>
+                            <DialogTitle>
+                                {actionType === 'add'
+                                    ? 'Thêm mới lịch họp'
+                                    : actionType === 'view'
+                                    ? 'Xem chi tiết lịch họp'
+                                    : 'Chỉnh sửa lịch họp'}
+                            </DialogTitle>
                             <DialogContent>
-                                <form onSubmit={handleSubmit} style={{ width: '400px' }}>
+                                <form
+                                    onSubmit={actionType === 'add' ? handleSubmit : handleUpdate}
+                                    style={{ width: '450px' }}
+                                >
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <TextField
                                             label="Tên cuộc họp"
@@ -205,6 +319,9 @@ const Announcement = () => {
                                             onChange={handleChange}
                                             required
                                             fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px', position: 'relative' }}>
@@ -217,6 +334,9 @@ const Announcement = () => {
                                             InputLabelProps={{ shrink: true, required: true }}
                                             required
                                             fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
@@ -227,6 +347,9 @@ const Announcement = () => {
                                             value={formData.note || ''}
                                             onChange={handleChange}
                                             fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
@@ -241,6 +364,9 @@ const Announcement = () => {
                                             fullWidth
                                             style={{ width: '100%', borderRadius: '4px' }}
                                             id="select-employees"
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
                                         >
                                             {employees.map((employee) => (
                                                 <MenuItem
@@ -253,14 +379,23 @@ const Announcement = () => {
                                             ))}
                                         </Select>
                                     </div>
-                                    <DialogActions>
-                                        <Button onClick={handleClose} color="primary">
-                                            Đóng
-                                        </Button>
-                                        <Button type="submit" onClick={handleSubmit} color="primary">
-                                            Thêm mới
-                                        </Button>
-                                    </DialogActions>
+                                    {actionType !== 'view' && (
+                                        <DialogActions>
+                                            <Button onClick={handleClose} color="primary">
+                                                Đóng
+                                            </Button>
+                                            <Button type="submit" color="primary">
+                                                {actionType === 'add' ? 'Thêm mới' : 'Cập nhật'}
+                                            </Button>
+                                        </DialogActions>
+                                    )}
+                                    {actionType === 'view' && (
+                                        <DialogActions>
+                                            <Button onClick={handleClose} color="primary">
+                                                Đóng
+                                            </Button>
+                                        </DialogActions>
+                                    )}
                                 </form>
                             </DialogContent>
                         </Dialog>
@@ -278,6 +413,7 @@ const Announcement = () => {
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Ghi chú</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Nhân viên</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>Lựa chọn</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -302,11 +438,47 @@ const Announcement = () => {
                                                         minute: '2-digit',
                                                     })}
                                                 </TableCell>
-                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                <TableCell
+                                                    className={styles.tableCell + ' text-center'}
+                                                    style={{ maxWidth: '200px' }}
+                                                >
                                                     {announcement.note}
                                                 </TableCell>
-                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                <TableCell
+                                                    className={styles.tableCell + ' text-center'}
+                                                    style={{ maxWidth: '200px' }}
+                                                >
                                                     {announcement.listEmployee.join(', ')}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    <div className={styles.cellAction}>
+                                                        {userPosition !== 'TRUONG_PHONG' && (
+                                                            <Button
+                                                                className={styles.viewButton}
+                                                                onClick={() => handleClickOpen('view', announcement)}
+                                                            >
+                                                                Xem chi tiết
+                                                            </Button>
+                                                        )}
+                                                        {userPosition === 'TRUONG_PHONG' && (
+                                                            <>
+                                                                <Button
+                                                                    className={styles.editButton}
+                                                                    onClick={() =>
+                                                                        handleClickOpen('edit', announcement)
+                                                                    }
+                                                                >
+                                                                    Chỉnh sửa
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleDelete(announcement._id)}
+                                                                    className={styles.deleteButton}
+                                                                >
+                                                                    Hoàn thành
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
