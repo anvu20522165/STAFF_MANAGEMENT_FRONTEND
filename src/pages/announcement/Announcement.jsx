@@ -13,6 +13,8 @@ import {
     DialogTitle,
     Button,
     TextField,
+    Select,
+    MenuItem,
 } from '@mui/material';
 import axios from 'axios';
 import styles from '../../components/datatable/datatable_user/datatable_user.module.css';
@@ -28,6 +30,8 @@ const Announcement = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [numOfTotalPages, setNumOfTotalPages] = useState(0);
     const [departmentTitle, setDepartmentTitle] = useState('');
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployees, setSelectedEmployees] = useState([]);
 
     const [open, setOpen] = useState(false);
 
@@ -42,7 +46,6 @@ const Announcement = () => {
             });
 
             setTableData(response.data);
-            console.log('aaa', response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
         } catch (error) {
             console.log(error.response.data);
@@ -61,11 +64,37 @@ const Announcement = () => {
             console.log(error);
         }
     };
+
+    const fetchEmployees = async () => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            const response = await axios.get('http://localhost:5555/v1/user/users/department', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            console.log(response.data);
+            setEmployees(response.data);
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
+    };
+
     useEffect(() => {
         loadAnnouncements();
         getUserInfo();
+        fetchEmployees();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleEmployeeChange = (event) => {
+        const selected = event.target.value;
+        setSelectedEmployees(selected);
+        setFormData({
+            ...formData,
+            listEmployee: selected.join(', '),
+        });
+    };
 
     const handlePageChange = ({ selected }) => {
         setCurrentPage(selected + 1);
@@ -195,24 +224,18 @@ const Announcement = () => {
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
-                                        <TextField
-                                            label="Nhân viên"
-                                            type="text"
-                                            name="listEmployee"
-                                            value={formData.listEmployee || ''}
-                                            onChange={handleChange}
-                                            fullWidth
-                                        />
-                                    </div>
-                                    <div style={{ width: '100%', marginBottom: '30px' }}>
-                                        <TextField
-                                            label="Phòng ban"
-                                            type="text"
-                                            name="department"
-                                            value={formData.department || ''}
-                                            onChange={handleChange}
-                                            fullWidth
-                                        />
+                                        <Select
+                                            multiple
+                                            value={selectedEmployees}
+                                            onChange={handleEmployeeChange}
+                                            renderValue={(selected) => selected.join(', ')}
+                                        >
+                                            {employees.map((employee) => (
+                                                <MenuItem key={employee.id} value={employee.fullname}>
+                                                    {employee.fullname}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
                                     </div>
                                     <DialogActions>
                                         <Button onClick={handleClose} color="primary">
