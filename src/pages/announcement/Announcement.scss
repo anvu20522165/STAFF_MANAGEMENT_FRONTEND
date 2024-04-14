@@ -25,3 +25,18 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+.select-style {
+    width: 100%;
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.select-style:hover,
+.select-style:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

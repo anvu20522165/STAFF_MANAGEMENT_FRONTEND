@@ -15,6 +15,7 @@ import {
     TextField,
     Select,
     MenuItem,
+    InputLabel,
 } from '@mui/material';
 import axios from 'axios';
 import styles from '../../components/datatable/datatable_user/datatable_user.module.css';
@@ -32,6 +33,7 @@ const Announcement = () => {
     const [departmentTitle, setDepartmentTitle] = useState('');
     const [employees, setEmployees] = useState([]);
     const [selectedEmployees, setSelectedEmployees] = useState([]);
+    const [userPosition, setUserPosition] = useState('');
 
     const [open, setOpen] = useState(false);
 
@@ -45,6 +47,7 @@ const Announcement = () => {
                 },
             });
 
+            console.log(response.data);
             setTableData(response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
         } catch (error) {
@@ -60,6 +63,7 @@ const Announcement = () => {
                 const label = mapValueToLabel(decodedToken.department);
                 setDepartmentTitle(`Lịch Biểu ${label}`); // Đặt title dựa trên phòng ban của user
             }
+            setUserPosition(decodedToken.position);
         } catch (error) {
             console.log(error);
         }
@@ -177,13 +181,15 @@ const Announcement = () => {
                     <div className={styles.datatable}>
                         <div className={styles.datatableTitle}>
                             <b>{departmentTitle}</b>
-                            <Button
-                                style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
-                                variant="contained"
-                                onClick={handleClickOpen}
-                            >
-                                Thêm mới
-                            </Button>
+                            {userPosition === 'TRUONG_PHONG' && (
+                                <Button
+                                    style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
+                                    variant="contained"
+                                    onClick={handleClickOpen}
+                                >
+                                    Thêm mới
+                                </Button>
+                            )}
                         </div>
 
                         <Dialog open={open} onClose={handleClose}>
@@ -224,14 +230,24 @@ const Announcement = () => {
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
+                                        <InputLabel htmlFor="select-employees" style={{ marginBottom: '8px' }}>
+                                            Nhân viên Tham Gia
+                                        </InputLabel>
                                         <Select
                                             multiple
                                             value={selectedEmployees}
                                             onChange={handleEmployeeChange}
                                             renderValue={(selected) => selected.join(', ')}
+                                            fullWidth
+                                            style={{ width: '100%', borderRadius: '4px' }}
+                                            id="select-employees"
                                         >
                                             {employees.map((employee) => (
-                                                <MenuItem key={employee.id} value={employee.fullname}>
+                                                <MenuItem
+                                                    key={employee.id}
+                                                    value={employee.fullname}
+                                                    style={{ width: '100%' }}
+                                                >
                                                     {employee.fullname}
                                                 </MenuItem>
                                             ))}
