@@ -10,12 +10,9 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     Button,
     TextField,
-    InputLabel,
-    InputLabelProps,
 } from '@mui/material';
 import axios from 'axios';
 import styles from '../../components/datatable/datatable_user/datatable_user.module.css';
@@ -23,18 +20,20 @@ import ReactPaginate from 'react-paginate';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 
 const Announcement = () => {
     const [tableData, setTableData] = useState([]);
     const [perPage, setPerPage] = useState(6);
     const [currentPage, setCurrentPage] = useState(1);
     const [numOfTotalPages, setNumOfTotalPages] = useState(0);
+    const [departmentTitle, setDepartmentTitle] = useState('');
 
     const [open, setOpen] = useState(false);
 
     const loadAnnouncements = async () => {
         try {
-            const accessToken = await AsyncStorage.getItem('accessToken'); // Lấy accessToken từ AsyncStorage
+            const accessToken = await AsyncStorage.getItem('accessToken');
 
             const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements', {
                 headers: {
@@ -50,8 +49,21 @@ const Announcement = () => {
         }
     };
 
+    const getUserInfo = async () => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            const decodedToken = jwtDecode(accessToken); // Giải mã accessToken để lấy thông tin user
+            if (decodedToken && decodedToken.department) {
+                const label = mapValueToLabel(decodedToken.department);
+                setDepartmentTitle(`Lịch Biểu ${label}`); // Đặt title dựa trên phòng ban của user
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     useEffect(() => {
         loadAnnouncements();
+        getUserInfo();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -92,7 +104,6 @@ const Announcement = () => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            // Sau khi thêm mới, reset form và cập nhật dữ liệu
             setFormData({
                 nameAnnouncement: '',
                 startAt: '',
@@ -107,6 +118,23 @@ const Announcement = () => {
         }
     };
 
+    const departments = [
+        { value: '', label: 'Tất cả' },
+        { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
+        { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
+        { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
+        { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
+        { value: 'PHONG_MARKETING', label: 'Phòng Marketing' },
+        { value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' },
+        { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
+        { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
+    ];
+
+    const mapValueToLabel = (value) => {
+        const department = departments.find((dept) => dept.value === value);
+        return department ? department.label : '';
+    };
+
     const indexOfLastAnnouncement = currentPage * perPage;
     const indexOfFirstAnnouncement = indexOfLastAnnouncement - perPage;
     const visibleAnnouncements = tableData?.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
@@ -119,7 +147,7 @@ const Announcement = () => {
                 <div className={styles.servicePage}>
                     <div className={styles.datatable}>
                         <div className={styles.datatableTitle}>
-                            <b>Lịch Biểu</b>
+                            <b>{departmentTitle}</b>
                             <Button
                                 style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
                                 variant="contained"
@@ -146,8 +174,8 @@ const Announcement = () => {
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px', position: 'relative' }}>
                                         <TextField
-                                            label="Ngày họp"
-                                            type="date"
+                                            label="Thời gian họp"
+                                            type="datetime-local"
                                             name="startAt"
                                             value={formData.startAt || ''}
                                             onChange={handleChange}
@@ -207,11 +235,10 @@ const Announcement = () => {
                                             Tên thông báo
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            Ngày bắt đầu
+                                            Thời gian họp
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Ghi chú</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Nhân viên</TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>Phòng ban</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -228,16 +255,19 @@ const Announcement = () => {
                                                     {announcement.nameAnnouncement}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
-                                                    {new Date(announcement.startAt).toLocaleDateString()}
+                                                    {new Date(announcement.startAt).toLocaleString('vi-VN', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
                                                     {announcement.note}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
                                                     {announcement.listEmployee.join(', ')}
-                                                </TableCell>
-                                                <TableCell className={styles.tableCell + ' text-center'}>
-                                                    {announcement.department}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
