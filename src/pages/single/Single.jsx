@@ -35,14 +35,12 @@ const Single = (item) => {
   ]
 
   const positions = [
-    { value: 'QUAN_LY', label: 'Quản lý' },
+    { value: 'CEO', label: 'Giám đốc điều hành' },
     { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
-    { value: 'PHO_PHONG', label: 'Phó phòng' },
     { value: 'NHAN_VIEN', label: 'Nhân viên' },
   ];
 
   const departments = [
-    { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
     { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
     { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
     { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
