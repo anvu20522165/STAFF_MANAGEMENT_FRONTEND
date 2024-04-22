@@ -19,7 +19,7 @@ const Widget = ({ type }) => {
     const accessToken = await AsyncStorage.getItem("accessToken");
     console.log(accessToken)
     axios
-      .get('http://localhost:5000/v1/user/users', { headers: { Authorization: `Bearer ${accessToken}` } })
+      .get('http://localhost:5555/v1/user/users', { headers: { Authorization: `Bearer ${accessToken}` } })
       .then((response) => {
         setUserNumber(response.data.length);
         console.log("all users:", response.data.length);

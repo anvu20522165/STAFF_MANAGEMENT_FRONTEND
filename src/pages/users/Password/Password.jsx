@@ -46,7 +46,7 @@ const Password = () => {
       newPassword: newPassword,
     }
     axios
-      .put(`http://localhost:5000/v1/auth/password/${userId}`, updatePassword, { headers: { Authorization: `Bearer ${token}` } })
+      .put(`http://localhost:5555/v1/auth/password/${userId}`, updatePassword, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         window.location.replace("/");
       }

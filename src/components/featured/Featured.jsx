@@ -4,7 +4,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
-const targetMoney = 50000000;
+const targetMoney = 55550000;
 
 const Featured = () => {
 //Date

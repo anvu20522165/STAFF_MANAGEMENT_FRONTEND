@@ -54,7 +54,7 @@ const Single = (item) => {
   const fetchDetail = async () => {
     console.log(userId)
     axios
-      .get(`http://localhost:5000/v1/user/${userId}`,)
+      .get(`http://localhost:5555/v1/user/${userId}`,)
       .then((response) => {
         //Set default values
         setUsername(response.data.username)
@@ -114,7 +114,7 @@ const Single = (item) => {
       department: department.value,
     }
     axios
-      .put(`http://localhost:5000/v1/user/${userId}`, updatedUser, { headers: { Authorization: `Bearer ${token}` } })
+      .put(`http://localhost:5555/v1/user/${userId}`, updatedUser, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         window.location.replace(`/users/${userId}`);
       })

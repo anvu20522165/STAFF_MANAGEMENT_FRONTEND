@@ -42,7 +42,7 @@ const Login = () => {
       password: password,
     }
     axios
-      .post("http://localhost:5000/v1/auth/login ", user)
+      .post("http://localhost:5555/v1/auth/login ", user)
       .then((response) => {
         console.log(response.data);     
         const accessToken = response.data.accessToken;

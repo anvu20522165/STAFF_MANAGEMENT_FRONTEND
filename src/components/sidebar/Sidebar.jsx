@@ -21,7 +21,7 @@ const Sidebar = () => {
     const data = "logout"
     // code to logout the user and clear user data from state
     axios
-      .post('http://localhost:5000/v1/auth/logout', data, {headers: {Authorization: `Bearer ${accessToken}`}})
+      .post('http://localhost:5555/v1/auth/logout', data, {headers: {Authorization: `Bearer ${accessToken}`}})
       .then((response) => {
         window.location.replace("/login");
         AsyncStorage.removeItem("accessToken")
