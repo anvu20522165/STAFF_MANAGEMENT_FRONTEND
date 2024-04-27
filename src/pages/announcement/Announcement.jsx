@@ -98,7 +98,6 @@ const Announcement = () => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            console.log(response.data);
             setEmployees(response.data);
         } catch (error) {
             console.error('Error fetching employees:', error);
@@ -209,24 +208,6 @@ const Announcement = () => {
         }
     };
 
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        try {
-            const accessToken = await AsyncStorage.getItem('accessToken');
-            await axios.put(`http://localhost:5555/v1/announcement/${editAnnouncement._id}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            setOpen(false);
-            loadAnnouncements();
-            handleSnackbarOpen('Cập nhật thành công!', 'success');
-        } catch (error) {
-            console.log(error.response.data);
-            handleSnackbarOpen('cập nhật thất bại!', 'error');
-        }
-    };
-
     const handleDelete = async (id) => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken'); // Hoặc cách lấy token của bạn
@@ -244,8 +225,6 @@ const Announcement = () => {
             }
             loadAnnouncements();
         } catch (error) {
-            console.error('Lỗi khi xóa announcement:', error);
-            alert('Đã có lỗi xảy ra khi xóa announcement. Vui lòng thử lại sau.');
             handleSnackbarOpen('Đã có lỗi xảy ra khi xóa announcement. Vui lòng thử lại sau.', 'error');
         }
     };
@@ -306,10 +285,7 @@ const Announcement = () => {
                                     : 'Chỉnh sửa lịch họp'}
                             </DialogTitle>
                             <DialogContent>
-                                <form
-                                    onSubmit={actionType === 'add' ? handleSubmit : handleUpdate}
-                                    style={{ width: '450px' }}
-                                >
+                                <form onSubmit={handleSubmit} style={{ width: '450px' }}>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <TextField
                                             label="Tên cuộc họp"

@@ -1,0 +1,42 @@
+.datatable {
+    height: 800px;
+    padding: 20px;
+    margin-left: 20px;
+    box-shadow: 2px 4px 10px 1px rgba(201, 201, 201, 0.47);
+}
+
+.datatable .datatableTitle {
+    width: 100%;
+    font-size: 24px;
+    color: rgb(97, 97, 97);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.datatable .datatableTitle .link {
+    text-decoration: none;
+    color: green;
+    font-size: 16px;
+    font-weight: 400;
+    border: 1px solid green;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.select-style {
+    width: 100%;
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.select-style:hover,
+.select-style:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

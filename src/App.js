@@ -9,6 +9,7 @@ import { DarkModeContext } from './context/darkModeContext';
 import List_user from './pages/list/list_users/List_user';
 import List_order from './pages/order/List_order';
 import Announcement from './pages/announcement/Announcement';
+import Document from './pages/document/Document';
 import MakeCalendar from './pages/calendars/makeCalendar';
 import Feedback from './pages/feedback/feedback';
 import NewFeedBack from './pages/feedback/NewFeedbacks';
@@ -26,6 +27,9 @@ function App() {
 
                         <Route path="announcement">
                             <Route index element={<Announcement />} />
+                        </Route>
+                        <Route path="document">
+                            <Route index element={<Document />} />
                         </Route>
 
                         <Route path="users">
