@@ -30,7 +30,7 @@ const Datatable_request = () => {
     });
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
     const positions = [
-        { value: '', label: 'Tất cả' },
+      { value: '', label: 'Tất cả' },
         { value: 'QUAN_LY', label: 'Quản lý' },
         { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
         { value: 'PHO_PHONG', label: 'Phó phòng' },
@@ -49,10 +49,6 @@ const Datatable_request = () => {
         { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
         { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
     ];
-    const mapValueToLabel = (value) => {
-        const department = departments.find((dept) => dept.value === value);
-        return department ? department.label : '';
-    };
     const [email, setEmail] = useState(() => {
         return params.email;
     });
@@ -112,7 +108,7 @@ const Datatable_request = () => {
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const url = buildSearchURL();
-
+        
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
@@ -130,42 +126,40 @@ const Datatable_request = () => {
         );
     }
 
-    function approveRequest(id) {
-        navigate(`/multiTask/add/${id}`);
+    function editUser(id) {
+        navigate(`/users/${id}`);
     }
 
-    function addNewRequest(id) {
-        navigate(`/requests/add`);
+    function addNewUser(id) {
+        navigate(`/users/add`);
     }
 
     useEffect(() => {
-        async function checkAuth() {
-            try {
-                const accessToken = await AsyncStorage.getItem('accessToken');
-                const decodedToken = jwtDecode(accessToken);
-                setIsAdmin(decodedToken.isAdmin);
-                let curTime = Date.now() / 1000;
-                if (decodedToken.exp < curTime) {
-                    window.location.replace('/login');
-                }
-            } catch (error) {
-                console.log('lỗi cmnr');
-            }
+      async function checkAuth() {
+        try {
+          const accessToken = await AsyncStorage.getItem("accessToken");
+          const decodedToken = jwtDecode(accessToken);
+          setIsAdmin(decodedToken.isAdmin)
+          let curTime = Date.now() / 1000;
+          if (decodedToken.exp < curTime) {
+            window.location.replace("/login");
+          }
+  
+        } catch (error) {
+          console.log("lỗi cmnr")
         }
-        checkAuth();
-        loadSVT();
-    }, []);
+      }
+      checkAuth()
+      loadSVT()
+    }, [])
 
-    const declineRequest = async (id) => {
+    const deleteUser = async (id) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         console.log(id);
-        const temp = 'temp';
         axios
-            .put(`http://localhost:5555/v1/request/decline/${id}`, temp, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            })
+            .delete(`http://localhost:5555/v1/user/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
-                window.location.replace(`/requests`);
+                console.log(response);
             })
             .catch((error) => {
                 window.alert("You don't have the permission to fulfill this action");
@@ -179,11 +173,11 @@ const Datatable_request = () => {
                 <div className={styles.datatableTitle}>
                     <b>Danh Sách Yêu Cầu</b>
                 </div>
-
+                
                 {isAdmin == true ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
-                            onClick={() => addNewRequest()}
+                            onClick={() => addNewUser()}
                             style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
                         >
                             Thêm Yêu Cầu
@@ -200,7 +194,6 @@ const Datatable_request = () => {
                                 <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Tiêu đề</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Ngày Tạo</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Phòng Ban</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Trạng Thái</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Lựa Chọn</TableCell>
                             </TableRow>
@@ -210,7 +203,7 @@ const Datatable_request = () => {
                                 visibleSVT?.map((item, index) => (
                                     <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell className={styles.tableCell + ' text-center'}>{index + 1}</TableCell>
-
+                                        
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             {item.title}
                                         </TableCell>
@@ -218,40 +211,24 @@ const Datatable_request = () => {
                                             {item.createdAt}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {mapValueToLabel(item.department)}
+                                            {item.isApproved}
                                         </TableCell>
-                                        {item.isApproved == 'Approved' ? (
-                                            <TableCell
-                                                className={styles.tableCell + ' text-center'}
-                                                style={{ color: 'green', fontWeight: 'bold' }}
-                                            >
-                                                {item.isApproved}
-                                            </TableCell>
-                                        ) : (
-                                            <TableCell className={styles.tableCell + ' text-center'}>
-                                                {item.isApproved}
-                                            </TableCell>
-                                        )}
-
+                                        
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.isApproved == 'Pending' ? (
-                                                <div className={styles.cellAction}>
-                                                    <Button
-                                                        onClick={() => approveRequest(item._id)}
-                                                        className={styles.editButton}
-                                                    >
-                                                        Approve
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() => declineRequest(item._id)}
-                                                        className={styles.deleteButton}
-                                                    >
-                                                        Decline
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <div>Không có</div>
-                                            )}
+                                            <div className={styles.cellAction}>
+                                                <Button
+                                                    onClick={() => editUser(item._id)}
+                                                    className={styles.editButton}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    onClick={() => deleteUser(item._id)}
+                                                    className={styles.deleteButton}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}

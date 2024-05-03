@@ -17,7 +17,6 @@ import queryString from 'query-string';
 import Select from 'react-select';
 const Datatable_multiTask = () => {
     const [departs, setDeparts] = useState([]);
-    const [greeting, setGreeting] = useState([]);
     const location = useLocation();
     const params = queryString.parse(location.search);
     const [username, setUsername] = useState(() => {
@@ -117,7 +116,7 @@ const Datatable_multiTask = () => {
         for (let index = 0; index < items.length; index++) {
             let joinDepart = [];
             for (let i = 0; i < items[index].tasks.length; i++) {
-                const temp = mapValueToLabel(items[index].tasks[i].department.value);
+                const temp = mapValueToLabel(items[index].tasks[i].department);
                 joinDepart.push(temp);
             }
             arrDepart.push(joinDepart.join(', '));
@@ -128,8 +127,6 @@ const Datatable_multiTask = () => {
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const url = buildSearchURL();
-        const decodedToken = jwtDecode(accessToken);
-        setGreeting(mapValueToLabel(decodedToken.department));
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
@@ -148,8 +145,12 @@ const Datatable_multiTask = () => {
         );
     }
 
-    function viewDetail(id) {
-        navigate(`/multiTask/${id}`);
+    function editUser(id) {
+        navigate(`/users/${id}`);
+    }
+
+    function addNewUser(id) {
+        navigate(`/users/add`);
     }
 
     useEffect(() => {
@@ -190,7 +191,20 @@ const Datatable_multiTask = () => {
                 <div className={styles.datatableTitle}>
                     <b>Danh Sách Yêu Cầu Liên Đơn Vị</b>
                 </div>
-                <b>Chào trưởng phòng {greeting}</b>
+
+                {isAdmin == true ? (
+                    <div style={{ marginBottom: 10 }}>
+                        <Button
+                            onClick={() => addNewUser()}
+                            style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
+                        >
+                            Thêm Yêu Cầu
+                        </Button>
+                    </div>
+                ) : (
+                    <div style={{ marginBottom: 10 }}></div>
+                )}
+
                 <TableContainer component={Paper} className={styles.table}>
                     <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
                         <TableHead>
@@ -226,10 +240,16 @@ const Datatable_multiTask = () => {
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             <div className={styles.cellAction}>
                                                 <Button
-                                                    onClick={() => viewDetail(item._id)}
+                                                    onClick={() => editUser(item._id)}
                                                     className={styles.editButton}
                                                 >
-                                                    Xem chi tiết
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    onClick={() => deleteUser(item._id)}
+                                                    className={styles.deleteButton}
+                                                >
+                                                    Delete
                                                 </Button>
                                             </div>
                                         </TableCell>
