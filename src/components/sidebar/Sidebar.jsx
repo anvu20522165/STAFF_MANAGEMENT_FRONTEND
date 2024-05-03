@@ -60,6 +60,12 @@ const Sidebar = () => {
                             <span>Tài liệu</span>
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/document" style={{ textDecoration: 'none' }}>
+                            <DescriptionIcon className="icon" />
+                            <span>Công việc liên đơn vị</span>
+                        </Link>
+                    </li>
                     <p className="title">Danh Sách</p>
                     <Link to="/users" style={{ textDecoration: 'none' }}>
                         <li>
