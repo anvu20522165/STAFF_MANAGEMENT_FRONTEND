@@ -11,11 +11,10 @@ import List_order from './pages/order/List_order';
 import Announcement from './pages/announcement/Announcement';
 import Document from './pages/document/Document';
 import MakeCalendar from './pages/calendars/makeCalendar';
-import Feedback from './pages/feedback/feedback';
-import NewFeedBack from './pages/feedback/NewFeedbacks';
 import Add from './pages/users/Add/Add';
 import Password from './pages/users/Password/Password';
-
+import List_request from './pages/list/list_request/List_request';
+import List_multiTask from './pages/list/list_multiTask/List_multiTask';
 function App() {
     const { darkMode } = useContext(DarkModeContext);
     return (
@@ -38,15 +37,18 @@ function App() {
                             <Route path="add" element={<Add />} />
                             <Route path="changePassword/:userId" element={<Password />} />
                         </Route>
+                        <Route path="requests">
+                            <Route index element={<List_request />} />
 
+                        </Route>
+                        <Route path="multiTask">
+                            <Route index element={<List_multiTask />} />
+
+                        </Route>
                         <Route path="calendar">
                             <Route index element={<MakeCalendar />} />
                         </Route>
 
-                        <Route path="feedbacks">
-                            <Route index element={<Feedback />} />
-                            <Route path="new" element={<NewFeedBack />} />
-                        </Route>
 
                         <Route path="login">
                             <Route index element={<Login />} />

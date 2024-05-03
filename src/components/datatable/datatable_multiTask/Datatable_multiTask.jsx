@@ -10,12 +10,13 @@ import { jwtDecode } from 'jwt-decode';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './datatable_user.module.css';
+import styles from './datatable_multiTask.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
 import Select from 'react-select';
-const Datatable_user = () => {
+const Datatable_multiTask = () => {
+    const [departs, setDeparts] = useState([]);
     const location = useLocation();
     const params = queryString.parse(location.search);
     const [username, setUsername] = useState(() => {
@@ -30,7 +31,7 @@ const Datatable_user = () => {
     });
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
     const positions = [
-      { value: '', label: 'Tất cả' },
+        { value: '', label: 'Tất cả' },
         { value: 'QUAN_LY', label: 'Quản lý' },
         { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
         { value: 'PHO_PHONG', label: 'Phó phòng' },
@@ -80,7 +81,7 @@ const Datatable_user = () => {
             position: position || '',
             department: department || '',
         };
-        let url = `http://localhost:5555/v1/user/users?`;
+        let url = `http://localhost:5555/v1/multiTask/?`;
 
         //check username
         if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
@@ -106,14 +107,32 @@ const Datatable_user = () => {
         return url;
     }
 
+    const mapValueToLabel = (value) => {
+        const department = departments.find((dept) => dept.value === value);
+        return department ? department.label : '';
+    };
+    const gatherDeparts = (items) => {
+        let arrDepart = [];
+        for (let index = 0; index < items.length; index++) {
+            let joinDepart = [];
+            for (let i = 0; i < items[index].tasks.length; i++) {
+                const temp = mapValueToLabel(items[index].tasks[i].department);
+                joinDepart.push(temp);
+            }
+            arrDepart.push(joinDepart.join(', '));
+        }
+        setDeparts(arrDepart);
+    };
+
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const url = buildSearchURL();
-        
+
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
                 setTableDataSVT(response.data);
+                gatherDeparts(response.data);
             })
             .catch((error) => {
                 console.log(error);
@@ -136,23 +155,22 @@ const Datatable_user = () => {
     }
 
     useEffect(() => {
-      async function checkAuth() {
-        try {
-          const accessToken = await AsyncStorage.getItem("accessToken");
-          const decodedToken = jwtDecode(accessToken);
-          setIsAdmin(decodedToken.isAdmin)
-          let curTime = Date.now() / 1000;
-          if (decodedToken.exp < curTime) {
-            window.location.replace("/login");
-          }
-  
-        } catch (error) {
-          console.log("lỗi cmnr")
+        async function checkAuth() {
+            try {
+                const accessToken = await AsyncStorage.getItem('accessToken');
+                const decodedToken = jwtDecode(accessToken);
+                setIsAdmin(decodedToken.isAdmin);
+                let curTime = Date.now() / 1000;
+                if (decodedToken.exp < curTime) {
+                    window.location.replace('/login');
+                }
+            } catch (error) {
+                console.log('lỗi cmnr');
+            }
         }
-      }
-      checkAuth()
-      loadSVT()
-    }, [])
+        checkAuth();
+        loadSVT();
+    }, []);
 
     const deleteUser = async (id) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
@@ -172,87 +190,16 @@ const Datatable_user = () => {
         <div className={styles.servicePage}>
             <div className={styles.datatable}>
                 <div className={styles.datatableTitle}>
-                    <b>Danh Sách Nhân Viên</b>
+                    <b>Danh Sách Yêu Cầu Liên Đơn Vị</b>
                 </div>
-                <div className="item">
-                    <div className={styles.details}>
-                        <div className={styles.detailItems}>
-                            <div className="itemKey">Tên:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={username}
-                                    type="text"
-                                    placeholder="Nhập username"
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Email:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={email}
-                                    type="text"
-                                    placeholder="Nhập email"
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Chức vụ:</div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedPosition}
-                                    onChange={setSelectedPosition}
-                                    options={positions}
-                                />
-                            </div>
 
-                            <div className="itemKey" style={{ marginLeft: 50 }}>
-                                Phòng ban:
-                            </div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedDepartment}
-                                    onChange={setSelectedDepartment}
-                                    options={departments}
-                                />
-                                <Button
-                                    onClick={() => search()}
-                                    style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
-                                >
-                                    {' '}
-                                    Tìm kiếm{' '}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {isAdmin == true ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
                             onClick={() => addNewUser()}
                             style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
                         >
-                            Thêm NV
+                            Thêm Yêu Cầu
                         </Button>
                     </div>
                 ) : (
@@ -264,47 +211,33 @@ const Datatable_user = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ảnh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Tên</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Email</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>SĐT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Sinh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Giới Tính</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Chức vụ</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Tiêu đề</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Tạo</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Các Phòng Ban</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Trạng Thái</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Lựa Chọn</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {visibleSVT?.length > 0 &&
+                                departs &&
                                 visibleSVT?.map((item, index) => (
                                     <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell className={styles.tableCell + ' text-center'}>{index + 1}</TableCell>
+
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            <img
-                                                style={{ width: 35, height: 35, borderRadius: 20 }}
-                                                src={item.avt}
-                                                alt=""
-                                                className="itemImg"
-                                            />
+                                            {item.requestid?.title}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.username}
+                                            {item.createdAt}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.email}
+                                            {departs[index]}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.phone}
+                                            {item.status}
                                         </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.birthDay}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.gender}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.positions}
-                                        </TableCell>
+
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             <div className={styles.cellAction}>
                                                 <Button
@@ -348,4 +281,4 @@ const Datatable_user = () => {
     );
 };
 
-export default Datatable_user;
+export default Datatable_multiTask;

@@ -10,12 +10,12 @@ import { jwtDecode } from 'jwt-decode';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './datatable_user.module.css';
+import styles from './datatable_request.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
 import Select from 'react-select';
-const Datatable_user = () => {
+const Datatable_request = () => {
     const location = useLocation();
     const params = queryString.parse(location.search);
     const [username, setUsername] = useState(() => {
@@ -80,7 +80,7 @@ const Datatable_user = () => {
             position: position || '',
             department: department || '',
         };
-        let url = `http://localhost:5555/v1/user/users?`;
+        let url = `http://localhost:5555/v1/request/?`;
 
         //check username
         if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
@@ -172,87 +172,16 @@ const Datatable_user = () => {
         <div className={styles.servicePage}>
             <div className={styles.datatable}>
                 <div className={styles.datatableTitle}>
-                    <b>Danh Sách Nhân Viên</b>
+                    <b>Danh Sách Yêu Cầu</b>
                 </div>
-                <div className="item">
-                    <div className={styles.details}>
-                        <div className={styles.detailItems}>
-                            <div className="itemKey">Tên:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={username}
-                                    type="text"
-                                    placeholder="Nhập username"
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Email:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={email}
-                                    type="text"
-                                    placeholder="Nhập email"
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Chức vụ:</div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedPosition}
-                                    onChange={setSelectedPosition}
-                                    options={positions}
-                                />
-                            </div>
-
-                            <div className="itemKey" style={{ marginLeft: 50 }}>
-                                Phòng ban:
-                            </div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedDepartment}
-                                    onChange={setSelectedDepartment}
-                                    options={departments}
-                                />
-                                <Button
-                                    onClick={() => search()}
-                                    style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
-                                >
-                                    {' '}
-                                    Tìm kiếm{' '}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
                 {isAdmin == true ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
                             onClick={() => addNewUser()}
                             style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
                         >
-                            Thêm NV
+                            Thêm Yêu Cầu
                         </Button>
                     </div>
                 ) : (
@@ -264,13 +193,9 @@ const Datatable_user = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ảnh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Tên</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Email</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>SĐT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Sinh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Giới Tính</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Chức vụ</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Tiêu đề</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Tạo</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Trạng Thái</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Lựa Chọn</TableCell>
                             </TableRow>
                         </TableHead>
@@ -279,32 +204,17 @@ const Datatable_user = () => {
                                 visibleSVT?.map((item, index) => (
                                     <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell className={styles.tableCell + ' text-center'}>{index + 1}</TableCell>
+                                        
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            <img
-                                                style={{ width: 35, height: 35, borderRadius: 20 }}
-                                                src={item.avt}
-                                                alt=""
-                                                className="itemImg"
-                                            />
+                                            {item.title}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.username}
+                                            {item.createdAt}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.email}
+                                            {item.isApproved}
                                         </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.phone}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.birthDay}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.gender}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.positions}
-                                        </TableCell>
+                                        
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             <div className={styles.cellAction}>
                                                 <Button
@@ -348,4 +258,4 @@ const Datatable_user = () => {
     );
 };
 
-export default Datatable_user;
+export default Datatable_request;

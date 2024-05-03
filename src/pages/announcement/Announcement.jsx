@@ -69,6 +69,7 @@ const Announcement = () => {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
+            console.log(response.data);
             setTableData(response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
         } catch (error) {
