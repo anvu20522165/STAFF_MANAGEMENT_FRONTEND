@@ -61,7 +61,13 @@ const Sidebar = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/document" style={{ textDecoration: 'none' }}>
+                        <Link to="/requests" style={{ textDecoration: 'none' }}>
+                            <DescriptionIcon className="icon" />
+                            <span>Yêu cầu</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/multiTask" style={{ textDecoration: 'none' }}>
                             <DescriptionIcon className="icon" />
                             <span>Công việc liên đơn vị</span>
                         </Link>
