@@ -130,6 +130,7 @@ const Announcement = () => {
                 nameAnnouncement: announcement.nameAnnouncement || '',
                 startAt: announcement.startAt || '',
                 note: announcement.note || '',
+                meeting: announcement.meeting || '',
                 listEmployee: announcement.listEmployee || '',
             });
             setSelectedEmployees(announcement.listEmployee || []);
@@ -140,6 +141,7 @@ const Announcement = () => {
                 nameAnnouncement: announcement.nameAnnouncement || '',
                 startAt: announcement.startAt || '',
                 note: announcement.note || '',
+                meeting: announcement.meeting || '',
                 listEmployee: announcement.listEmployee ? announcement.listEmployee.join(', ') : '',
                 department: announcement.department || '',
             });
@@ -171,6 +173,7 @@ const Announcement = () => {
         nameAnnouncement: '',
         startAt: '',
         note: '',
+        meeting: '',
         listEmployee: '',
     });
 
@@ -329,6 +332,19 @@ const Announcement = () => {
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
+                                        <TextField
+                                            label="Phòng họp đăng kí"
+                                            type="text"
+                                            name="meeting"
+                                            value={formData.meeting || ''}
+                                            onChange={handleChange}
+                                            fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <InputLabel htmlFor="select-employees" style={{ marginBottom: '8px' }}>
                                             Nhân viên Tham Gia
                                         </InputLabel>
@@ -382,12 +398,15 @@ const Announcement = () => {
                                     <TableRow>
                                         <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            Tên thông báo
+                                            Tên cuộc họp
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             Thời gian họp
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Ghi chú</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            Phòng họp đăng kí
+                                        </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Nhân viên</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Lựa chọn</TableCell>
                                     </TableRow>
@@ -419,6 +438,12 @@ const Announcement = () => {
                                                     style={{ maxWidth: '200px' }}
                                                 >
                                                     {announcement.note}
+                                                </TableCell>
+                                                <TableCell
+                                                    className={styles.tableCell + ' text-center'}
+                                                    style={{ maxWidth: '200px' }}
+                                                >
+                                                    {announcement.meeting}
                                                 </TableCell>
                                                 <TableCell
                                                     className={styles.tableCell + ' text-center'}
