@@ -132,7 +132,7 @@ const Announcement = () => {
                 note: announcement.note || '',
                 listEmployee: announcement.listEmployee || '',
             });
-            setSelectedEmployees([]);
+            setSelectedEmployees(announcement.listEmployee || []);
             setEditAnnouncement(announcement);
             setActionType('edit');
         } else if (type === 'view' && announcement) {
