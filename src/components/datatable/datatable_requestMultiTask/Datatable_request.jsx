@@ -10,12 +10,12 @@ import { jwtDecode } from 'jwt-decode';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styles from './datatable_user.module.css';
+import styles from './datatable_request.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
 import Select from 'react-select';
-const Datatable_user = () => {
+const Datatable_request = () => {
     const location = useLocation();
     const params = queryString.parse(location.search);
     const [username, setUsername] = useState(() => {
@@ -30,7 +30,7 @@ const Datatable_user = () => {
     });
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
     const positions = [
-      { value: '', label: 'Tất cả' },
+        { value: '', label: 'Tất cả' },
         { value: 'QUAN_LY', label: 'Quản lý' },
         { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
         { value: 'PHO_PHONG', label: 'Phó phòng' },
@@ -49,7 +49,10 @@ const Datatable_user = () => {
         { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
         { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
     ];
-
+    const mapValueToLabel = (value) => {
+        const department = departments.find((dept) => dept.value === value);
+        return department ? department.label : '';
+    };
     const [email, setEmail] = useState(() => {
         return params.email;
     });
@@ -80,7 +83,7 @@ const Datatable_user = () => {
             position: position || '',
             department: department || '',
         };
-        let url = `http://localhost:5555/v1/user/users?`;
+        let url = `http://localhost:5555/v1/request/?`;
 
         //check username
         if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
@@ -109,7 +112,7 @@ const Datatable_user = () => {
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const url = buildSearchURL();
-        
+
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
@@ -127,40 +130,42 @@ const Datatable_user = () => {
         );
     }
 
-    function editUser(id) {
-        navigate(`/users/${id}`);
+    function approveRequest(id) {
+        navigate(`/multiTask/add/${id}`);
     }
 
-    function addNewUser(id) {
-        navigate(`/users/add`);
+    function addNewRequest(id) {
+        navigate(`/requests/add`);
     }
 
     useEffect(() => {
-      async function checkAuth() {
-        try {
-          const accessToken = await AsyncStorage.getItem("accessToken");
-          const decodedToken = jwtDecode(accessToken);
-          setIsAdmin(decodedToken.isAdmin)
-          let curTime = Date.now() / 1000;
-          if (decodedToken.exp < curTime) {
-            window.location.replace("/login");
-          }
-  
-        } catch (error) {
-          console.log("lỗi cmnr")
+        async function checkAuth() {
+            try {
+                const accessToken = await AsyncStorage.getItem('accessToken');
+                const decodedToken = jwtDecode(accessToken);
+                setIsAdmin(decodedToken.isAdmin);
+                let curTime = Date.now() / 1000;
+                if (decodedToken.exp < curTime) {
+                    window.location.replace('/login');
+                }
+            } catch (error) {
+                console.log('lỗi cmnr');
+            }
         }
-      }
-      checkAuth()
-      loadSVT()
-    }, [])
+        checkAuth();
+        loadSVT();
+    }, []);
 
-    const deleteUser = async (id) => {
+    const declineRequest = async (id) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         console.log(id);
+        const temp = 'temp';
         axios
-            .delete(`http://localhost:5555/v1/user/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+            .put(`http://localhost:5555/v1/request/decline/${id}`, temp, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            })
             .then((response) => {
-                console.log(response);
+                window.location.replace(`/requests`);
             })
             .catch((error) => {
                 window.alert("You don't have the permission to fulfill this action");
@@ -172,87 +177,16 @@ const Datatable_user = () => {
         <div className={styles.servicePage}>
             <div className={styles.datatable}>
                 <div className={styles.datatableTitle}>
-                    <b>Danh Sách Nhân Viên</b>
+                    <b>Danh Sách Yêu Cầu</b>
                 </div>
-                <div className="item">
-                    <div className={styles.details}>
-                        <div className={styles.detailItems}>
-                            <div className="itemKey">Tên:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={username}
-                                    type="text"
-                                    placeholder="Nhập username"
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Email:</div>
-                            <div className="itemValue">
-                                <input
-                                    style={{
-                                        padding: 10,
-                                        borderColor: '#D0D0D0',
-                                        borderWidth: 2,
-                                        marginTop: 5,
-                                        marginLeft: 5,
-                                        borderRadius: 5,
-                                        fontSize: 15,
-                                        marginRight: 30,
-                                        width: 200,
-                                    }}
-                                    value={email}
-                                    type="text"
-                                    placeholder="Nhập email"
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                            <div className="itemKey">Chức vụ:</div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedPosition}
-                                    onChange={setSelectedPosition}
-                                    options={positions}
-                                />
-                            </div>
 
-                            <div className="itemKey" style={{ marginLeft: 50 }}>
-                                Phòng ban:
-                            </div>
-                            <div className="itemValue" style={{ marginLeft: 10 }}>
-                                <Select
-                                    defaultValue={selectedDepartment}
-                                    onChange={setSelectedDepartment}
-                                    options={departments}
-                                />
-                                <Button
-                                    onClick={() => search()}
-                                    style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
-                                >
-                                    {' '}
-                                    Tìm kiếm{' '}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {isAdmin == true ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
-                            onClick={() => addNewUser()}
+                            onClick={() => addNewRequest()}
                             style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
                         >
-                            Thêm NV
+                            Thêm Yêu Cầu
                         </Button>
                     </div>
                 ) : (
@@ -264,13 +198,10 @@ const Datatable_user = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ảnh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Tên</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Email</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>SĐT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Sinh</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Giới Tính</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Chức vụ</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Tiêu đề</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Tạo</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Phòng Ban</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Trạng Thái</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Lựa Chọn</TableCell>
                             </TableRow>
                         </TableHead>
@@ -279,47 +210,48 @@ const Datatable_user = () => {
                                 visibleSVT?.map((item, index) => (
                                     <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell className={styles.tableCell + ' text-center'}>{index + 1}</TableCell>
+
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            <img
-                                                style={{ width: 35, height: 35, borderRadius: 20 }}
-                                                src={item.avt}
-                                                alt=""
-                                                className="itemImg"
-                                            />
+                                            {item.title}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.username}
+                                            {item.createdAt}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.email}
+                                            {mapValueToLabel(item.department)}
                                         </TableCell>
+                                        {item.isApproved == 'Approved' ? (
+                                            <TableCell
+                                                className={styles.tableCell + ' text-center'}
+                                                style={{ color: 'green', fontWeight: 'bold' }}
+                                            >
+                                                {item.isApproved}
+                                            </TableCell>
+                                        ) : (
+                                            <TableCell className={styles.tableCell + ' text-center'}>
+                                                {item.isApproved}
+                                            </TableCell>
+                                        )}
+
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.phone}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.birthDay}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.gender}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.positions}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            <div className={styles.cellAction}>
-                                                <Button
-                                                    onClick={() => editUser(item._id)}
-                                                    className={styles.editButton}
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    onClick={() => deleteUser(item._id)}
-                                                    className={styles.deleteButton}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </div>
+                                            {item.isApproved == 'Pending' ? (
+                                                <div className={styles.cellAction}>
+                                                    <Button
+                                                        onClick={() => approveRequest(item._id)}
+                                                        className={styles.editButton}
+                                                    >
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => declineRequest(item._id)}
+                                                        className={styles.deleteButton}
+                                                    >
+                                                        Decline
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div>Không có</div>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -348,4 +280,4 @@ const Datatable_user = () => {
     );
 };
 
-export default Datatable_user;
+export default Datatable_request;
