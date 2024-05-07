@@ -465,6 +465,7 @@ const Announcement = () => {
                                                             <>
                                                                 <Button
                                                                     className={styles.editButton}
+                                                                    style={{ minWidth: 'max-content' }}
                                                                     onClick={() =>
                                                                         handleClickOpen('edit', announcement)
                                                                     }
@@ -474,6 +475,7 @@ const Announcement = () => {
                                                                 <Button
                                                                     onClick={() => handleDelete(announcement._id)}
                                                                     className={styles.deleteButton}
+                                                                    style={{ minWidth: 'max-content' }}
                                                                 >
                                                                     Hoàn thành
                                                                 </Button>
