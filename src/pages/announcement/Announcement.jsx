@@ -27,6 +27,8 @@ import './Announcement.scss';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 
 const Announcement = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -45,6 +47,15 @@ const Announcement = () => {
     const [open, setOpen] = useState(false);
     const [isViewMode, setIsViewMode] = useState(false);
 
+    const location = useLocation();
+    const params = queryString.parse(location.search);
+    const [nameAnnouncement, setNameAnnouncement] = useState(() => {
+        return params.nameAnnouncement;
+    });
+    const [meeting, setMeeting] = useState(() => {
+        return params.meeting;
+    });
+
     let [visibleAnnouncements, setVisibleAnnouncements] = useState([]);
 
     const handleSnackbarOpen = (message, severity) => {
@@ -60,22 +71,53 @@ const Announcement = () => {
         setOpenSnackbar(false);
     };
 
+    function buildSearchURL() {
+        const searchData = {
+            nameAnnouncement: nameAnnouncement || '',
+            meeting: meeting || '',
+        };
+        let url = `http://localhost:5555/v1/announcement/get-all-announcements?`;
+
+        // Check nameAnnouncement
+        if (searchData.nameAnnouncement !== undefined && searchData.nameAnnouncement !== 'undefined') {
+            url = url + `nameAnnouncement=${searchData.nameAnnouncement}`;
+        } else {
+            url = url + `nameAnnouncement=`;
+            setNameAnnouncement('');
+        }
+
+        // Check meeting
+        if (searchData.meeting !== undefined && searchData.meeting !== 'undefined') {
+            url = url + `&meeting=${searchData.meeting}`;
+        } else {
+            url = url + `&meeting=`;
+            setMeeting('');
+        }
+
+        return url;
+    }
+
     const loadAnnouncements = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
+            const url = buildSearchURL();
 
-            const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements', {
+            const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            console.log(response.data);
+
             setTableData(response.data);
             setNumOfTotalPages(Math.ceil(response.data.length / perPage));
         } catch (error) {
             console.log(error.response.data);
         }
     };
+
+    function search() {
+        window.location.replace(`/announcement?nameAnnouncement=${nameAnnouncement}&meeting=${meeting}`);
+    }
 
     const getUserInfo = async () => {
         try {
@@ -393,7 +435,63 @@ const Announcement = () => {
                             </DialogContent>
                         </Dialog>
 
-                        <TableContainer component={Paper} className={styles.table}>
+                        <div className="item">
+                            <div className={styles.details}>
+                                <div className={styles.detailItems}>
+                                    <div className="itemKey">Tên cuộc họp:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={nameAnnouncement}
+                                            type="text"
+                                            placeholder="Nhập tên cuộc họp"
+                                            onChange={(e) => setNameAnnouncement(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="itemKey">phòng họp đăng kí:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={meeting}
+                                            type="text"
+                                            placeholder="Nhập phòng họp"
+                                            onChange={(e) => setMeeting(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="itemValue" style={{ marginLeft: 10 }}>
+                                        <Button
+                                            onClick={() => search()}
+                                            style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
+                                        >
+                                            Tìm kiếm{' '}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <TableContainer component={Paper} className={styles.table} style={{ marginTop: '25px' }}>
                             <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
                                 <TableHead>
                                     <TableRow>
