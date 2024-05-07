@@ -27,6 +27,8 @@ import './Announcement.scss';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 
 const Announcement = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -45,6 +47,15 @@ const Announcement = () => {
     const [open, setOpen] = useState(false);
     const [isViewMode, setIsViewMode] = useState(false);
 
+    const location = useLocation();
+    const params = queryString.parse(location.search);
+    const [nameAnnouncement, setNameAnnouncement] = useState(() => {
+        return params.nameAnnouncement;
+    });
+    const [meeting, setMeeting] = useState(() => {
+        return params.meeting;
+    });
+
     let [visibleAnnouncements, setVisibleAnnouncements] = useState([]);
 
     const handleSnackbarOpen = (message, severity) => {
@@ -60,11 +71,38 @@ const Announcement = () => {
         setOpenSnackbar(false);
     };
 
+    function buildSearchURL() {
+        const searchData = {
+            nameAnnouncement: nameAnnouncement || '',
+            meeting: meeting || '',
+        };
+        let url = `http://localhost:5555/v1/announcement/get-all-announcements?`;
+
+        // Check nameAnnouncement
+        if (searchData.nameAnnouncement !== undefined && searchData.nameAnnouncement !== 'undefined') {
+            url = url + `nameAnnouncement=${searchData.nameAnnouncement}`;
+        } else {
+            url = url + `nameAnnouncement=`;
+            setNameAnnouncement('');
+        }
+
+        // Check meeting
+        if (searchData.meeting !== undefined && searchData.meeting !== 'undefined') {
+            url = url + `&meeting=${searchData.meeting}`;
+        } else {
+            url = url + `&meeting=`;
+            setMeeting('');
+        }
+
+        return url;
+    }
+
     const loadAnnouncements = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
+            const url = buildSearchURL();
 
-            const response = await axios.get('http://localhost:5555/v1/announcement/get-all-announcements', {
+            const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -76,6 +114,10 @@ const Announcement = () => {
             console.log(error.response.data);
         }
     };
+
+    function search() {
+        window.location.replace(`/announcement?nameAnnouncement=${nameAnnouncement}&meeting=${meeting}`);
+    }
 
     const getUserInfo = async () => {
         try {
@@ -131,9 +173,10 @@ const Announcement = () => {
                 nameAnnouncement: announcement.nameAnnouncement || '',
                 startAt: announcement.startAt || '',
                 note: announcement.note || '',
+                meeting: announcement.meeting || '',
                 listEmployee: announcement.listEmployee || '',
             });
-            setSelectedEmployees([]);
+            setSelectedEmployees(announcement.listEmployee || []);
             setEditAnnouncement(announcement);
             setActionType('edit');
         } else if (type === 'view' && announcement) {
@@ -141,6 +184,7 @@ const Announcement = () => {
                 nameAnnouncement: announcement.nameAnnouncement || '',
                 startAt: announcement.startAt || '',
                 note: announcement.note || '',
+                meeting: announcement.meeting || '',
                 listEmployee: announcement.listEmployee ? announcement.listEmployee.join(', ') : '',
                 department: announcement.department || '',
             });
@@ -172,6 +216,7 @@ const Announcement = () => {
         nameAnnouncement: '',
         startAt: '',
         note: '',
+        meeting: '',
         listEmployee: '',
     });
 
@@ -330,6 +375,19 @@ const Announcement = () => {
                                         />
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
+                                        <TextField
+                                            label="Phòng họp đăng kí"
+                                            type="text"
+                                            name="meeting"
+                                            value={formData.meeting || ''}
+                                            onChange={handleChange}
+                                            fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <InputLabel htmlFor="select-employees" style={{ marginBottom: '8px' }}>
                                             Nhân viên Tham Gia
                                         </InputLabel>
@@ -377,18 +435,77 @@ const Announcement = () => {
                             </DialogContent>
                         </Dialog>
 
-                        <TableContainer component={Paper} className={styles.table}>
+                        <div className="item">
+                            <div className={styles.details}>
+                                <div className={styles.detailItems}>
+                                    <div className="itemKey">Tên cuộc họp:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={nameAnnouncement}
+                                            type="text"
+                                            placeholder="Nhập tên cuộc họp"
+                                            onChange={(e) => setNameAnnouncement(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="itemKey">phòng họp đăng kí:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={meeting}
+                                            type="text"
+                                            placeholder="Nhập phòng họp"
+                                            onChange={(e) => setMeeting(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="itemValue" style={{ marginLeft: 10 }}>
+                                        <Button
+                                            onClick={() => search()}
+                                            style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
+                                        >
+                                            Tìm kiếm{' '}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <TableContainer component={Paper} className={styles.table} style={{ marginTop: '25px' }}>
                             <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            Tên thông báo
+                                            Tên cuộc họp
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             Thời gian họp
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Ghi chú</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            Phòng họp đăng kí
+                                        </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Nhân viên</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Lựa chọn</TableCell>
                                     </TableRow>
@@ -425,6 +542,12 @@ const Announcement = () => {
                                                     className={styles.tableCell + ' text-center'}
                                                     style={{ maxWidth: '200px' }}
                                                 >
+                                                    {announcement.meeting}
+                                                </TableCell>
+                                                <TableCell
+                                                    className={styles.tableCell + ' text-center'}
+                                                    style={{ maxWidth: '200px' }}
+                                                >
                                                     {announcement.listEmployee.join(', ')}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
@@ -441,6 +564,7 @@ const Announcement = () => {
                                                             <>
                                                                 <Button
                                                                     className={styles.editButton}
+                                                                    style={{ minWidth: 'max-content' }}
                                                                     onClick={() =>
                                                                         handleClickOpen('edit', announcement)
                                                                     }
@@ -450,6 +574,7 @@ const Announcement = () => {
                                                                 <Button
                                                                     onClick={() => handleDelete(announcement._id)}
                                                                     className={styles.deleteButton}
+                                                                    style={{ minWidth: 'max-content' }}
                                                                 >
                                                                     Hoàn thành
                                                                 </Button>
