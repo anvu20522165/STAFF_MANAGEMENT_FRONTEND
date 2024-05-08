@@ -27,6 +27,8 @@ import './Document.scss';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 
 const Document = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -43,6 +45,15 @@ const Document = () => {
     const [actionType, setActionType] = useState('add');
     let [visibleDocuments, setVisibleDocument] = useState([]);
     const [isViewMode, setIsViewMode] = useState(false);
+
+    const location = useLocation();
+    const params = queryString.parse(location.search);
+    const [nameDocument, setNameDocument] = useState(() => {
+        return params.nameDocument;
+    });
+    const [Source, setSource] = useState(() => {
+        return params.Source;
+    });
 
     const indexOfLastDocument = currentPage * perPage;
     const indexOfFirstDocument = indexOfLastDocument - perPage;
@@ -61,11 +72,39 @@ const Document = () => {
         setOpenSnackbar(false);
     };
 
+    function buildSearchURL() {
+        const searchData = {
+            nameDocument: nameDocument || '',
+            Source: Source || '',
+        };
+        let url = `http://localhost:5555/v1/document/get-all-documents?`;
+
+        // Check nameAnnouncement
+        if (searchData.nameDocument !== undefined && searchData.nameDocument !== 'undefined') {
+            url = url + `nameDocument=${searchData.nameDocument}`;
+        } else {
+            url = url + `nameDocument=`;
+            setNameDocument('');
+        }
+
+        // Check meeting
+        if (searchData.Source !== undefined && searchData.Source !== 'undefined') {
+            url = url + `&Source=${searchData.Source}`;
+        } else {
+            url = url + `&Source=`;
+            setSource('');
+        }
+
+        return url;
+    }
+
     const loadDocumnet = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
 
-            const response = await axios.get('http://localhost:5555/v1/document/get-all-documents', {
+            const url = buildSearchURL();
+
+            const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -76,6 +115,10 @@ const Document = () => {
             console.log(error.response.data);
         }
     };
+
+    function search() {
+        window.location.replace(`/document?nameDocument=${nameDocument}&Source=${Source}`);
+    }
 
     const getUserInfo = async () => {
         try {
@@ -99,18 +142,6 @@ const Document = () => {
         Source: '',
         NumberOfDocument: '',
     });
-
-    const departments = [
-        { value: '', label: 'Tất cả' },
-        { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
-        { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
-        { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
-        { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
-        { value: 'PHONG_MARKETING', label: 'Phòng Marketing' },
-        { value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' },
-        { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
-        { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
-    ];
 
     const handleClickOpen = (type, document = null) => {
         if (type === 'edit' && document) {
@@ -304,7 +335,63 @@ const Document = () => {
                             </DialogContent>
                         </Dialog>
 
-                        <TableContainer component={Paper} className={styles.table}>
+                        <div className="item">
+                            <div className={styles.details}>
+                                <div className={styles.detailItems}>
+                                    <div className="itemKey">Tên tài liệu:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={nameDocument}
+                                            type="text"
+                                            placeholder="Nhập tên tài liệu"
+                                            onChange={(e) => setNameDocument(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="itemKey">Nguồn tài liệu:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                                marginRight: 30,
+                                                width: 200,
+                                            }}
+                                            value={Source}
+                                            type="text"
+                                            placeholder="Nhập nguồn tài liệu"
+                                            onChange={(e) => setSource(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="itemValue" style={{ marginLeft: 10 }}>
+                                        <Button
+                                            onClick={() => search()}
+                                            style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
+                                        >
+                                            Tìm kiếm{' '}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <TableContainer component={Paper} className={styles.table} style={{ marginTop: '25px' }}>
                             <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
                                 <TableHead>
                                     <TableRow>
