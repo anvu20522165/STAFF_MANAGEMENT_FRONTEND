@@ -24,13 +24,15 @@ const Datatable_user = () => {
     const [position, setPosition] = useState(() => {
         return params.position;
     });
+    const [departmentHead, setDepartmentHead] = useState('');
+    const [departmentHR, setDepartmentHR] = useState('');
 
     const [department, setDepartment] = useState(() => {
         return params.department;
     });
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
     const positions = [
-      { value: '', label: 'Tất cả' },
+        { value: '', label: 'Tất cả' },
         { value: 'QUAN_LY', label: 'Quản lý' },
         { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
         { value: 'PHO_PHONG', label: 'Phó phòng' },
@@ -109,10 +111,11 @@ const Datatable_user = () => {
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const url = buildSearchURL();
-        
+
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
+                console.log(response.data);
                 setTableDataSVT(response.data);
             })
             .catch((error) => {
@@ -136,23 +139,23 @@ const Datatable_user = () => {
     }
 
     useEffect(() => {
-      async function checkAuth() {
-        try {
-          const accessToken = await AsyncStorage.getItem("accessToken");
-          const decodedToken = jwtDecode(accessToken);
-          setIsAdmin(decodedToken.isAdmin)
-          let curTime = Date.now() / 1000;
-          if (decodedToken.exp < curTime) {
-            window.location.replace("/login");
-          }
-  
-        } catch (error) {
-          console.log("lỗi cmnr")
+        async function checkAuth() {
+            try {
+                const accessToken = await AsyncStorage.getItem('accessToken');
+                const decodedToken = jwtDecode(accessToken);
+                setDepartmentHead(decodedToken.position);
+                setDepartmentHR(decodedToken.department);
+                let curTime = Date.now() / 1000;
+                if (decodedToken.exp < curTime) {
+                    window.location.replace('/login');
+                }
+            } catch (error) {
+                console.log('lỗi cmnr');
+            }
         }
-      }
-      checkAuth()
-      loadSVT()
-    }, [])
+        checkAuth();
+        loadSVT();
+    }, []);
 
     const deleteUser = async (id) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
@@ -167,7 +170,14 @@ const Datatable_user = () => {
             });
         loadSVT();
     };
-
+    const mapValueToLabel = (value) => {
+        const position = positions.find((dept) => dept.value === value);
+        return position ? position.label : '';
+    };
+    const mapValueToLabelDepartment = (value) => {
+        const department = departments.find((dept) => dept.value === value);
+        return department ? department.label : '';
+    };
     return (
         <div className={styles.servicePage}>
             <div className={styles.datatable}>
@@ -246,7 +256,7 @@ const Datatable_user = () => {
                         </div>
                     </div>
                 </div>
-                {isAdmin == true ? (
+                {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
                             onClick={() => addNewUser()}
@@ -267,9 +277,9 @@ const Datatable_user = () => {
                                 <TableCell className={styles.tableCell + ' text-center'}>Ảnh</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Tên</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Email</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>SĐT</TableCell>
-                                <TableCell className={styles.tableCell + ' text-center'}>Ngày Sinh</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Giới Tính</TableCell>
+                                <TableCell className={styles.tableCell + ' text-center'}>Phòng Ban</TableCell>
+
                                 <TableCell className={styles.tableCell + ' text-center'}>Chức vụ</TableCell>
                                 <TableCell className={styles.tableCell + ' text-center'}>Lựa Chọn</TableCell>
                             </TableRow>
@@ -294,16 +304,15 @@ const Datatable_user = () => {
                                             {item.email}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.phone}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.birthDay}
-                                        </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
                                             {item.gender}
                                         </TableCell>
+
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.positions}
+                                            {mapValueToLabelDepartment(item.department)}
+                                        </TableCell>
+
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            {mapValueToLabel(item.position)}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             <div className={styles.cellAction}>

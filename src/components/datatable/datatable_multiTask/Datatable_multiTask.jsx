@@ -14,7 +14,7 @@ import styles from './datatable_multiTask.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
-import Select from 'react-select';
+import { format } from 'date-fns';
 const Datatable_multiTask = () => {
     const [departs, setDeparts] = useState([]);
     const [greeting, setGreeting] = useState([]);
@@ -84,23 +84,23 @@ const Datatable_multiTask = () => {
         };
         let url = `http://localhost:5555/v1/multiTask/?`;
 
-        //check username
-        if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
-            url = url + `username=${searchData.usernameSearch}`;
-        } else {
-            url = url + `username=`;
-            setUsername('');
-        }
+        // //check username
+        // if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
+        //     url = url + `username=${searchData.usernameSearch}`;
+        // } else {
+        //     url = url + `username=`;
+        //     setUsername('');
+        // }
 
-        //check email
-        if (searchData.emailSearch !== undefined && searchData.emailSearch !== 'undefined') {
-            url = url + `&email=${searchData.emailSearch}`;
-        } else {
-            url = url + `&email=`;
-            setEmail('');
-        }
-        //check position
-        url = url + `&position=${searchData.position}`;
+        // //check email
+        // if (searchData.emailSearch !== undefined && searchData.emailSearch !== 'undefined') {
+        //     url = url + `&email=${searchData.emailSearch}`;
+        // } else {
+        //     url = url + `&email=`;
+        //     setEmail('');
+        // }
+        // //check position
+        // url = url + `&position=${searchData.position}`;
 
         //check department
         url = url + `&department=${searchData.department}`;
@@ -112,29 +112,29 @@ const Datatable_multiTask = () => {
         const department = departments.find((dept) => dept.value === value);
         return department ? department.label : '';
     };
-    const gatherDeparts = (items) => {
-        let arrDepart = [];
+
+    const convertDeparts = (items) => {
+        let departments = [];
         for (let index = 0; index < items.length; index++) {
-            let joinDepart = [];
-            for (let i = 0; i < items[index].tasks.length; i++) {
-                const temp = mapValueToLabel(items[index].tasks[i].department.value);
-                joinDepart.push(temp);
-            }
-            arrDepart.push(joinDepart.join(', '));
+            const department = items[index].department.label;
+            departments.push(department);
         }
-        setDeparts(arrDepart);
+        return departments.join(', ');
     };
 
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
-        const url = buildSearchURL();
+        // const url = buildSearchURL();
+        let url = `http://localhost:5555/v1/multiTask/?`;
+        //check department
         const decodedToken = jwtDecode(accessToken);
+
+        url = url + `department=${decodedToken.department}`;
         setGreeting(mapValueToLabel(decodedToken.department));
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
                 setTableDataSVT(response.data);
-                gatherDeparts(response.data);
             })
             .catch((error) => {
                 console.log(error);
@@ -214,14 +214,23 @@ const Datatable_multiTask = () => {
                                             {item.requestid?.title}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.createdAt}
+                                            {format(item.createdAt, 'MM/dd/yyyy kk:mm:ss')}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {departs[index]}
+                                            {convertDeparts(item.tasks)}
                                         </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.status}
-                                        </TableCell>
+                                        {item.status == 'Đã Hoàn Thành' ? (
+                                            <TableCell
+                                                className={styles.tableCell + ' text-center'}
+                                                style={{ background: 'green' }}
+                                            >
+                                                {item.status}
+                                            </TableCell>
+                                        ) : (
+                                            <TableCell className={styles.tableCell + ' text-center'}>
+                                                {item.status}
+                                            </TableCell>
+                                        )}
 
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             <div className={styles.cellAction}>
