@@ -1,5 +1,5 @@
 import './navbar.scss';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import { Link } from 'react-router-dom';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import { DarkModeContext } from '../../context/darkModeContext';
 import { useContext, useState, useEffect } from 'react';
@@ -43,11 +43,13 @@ const Navbar = () => {
                     </div>
 
                     <div className="item">
-                        <img
-                            src="https://us.123rf.com/450wm/anatolir/anatolir2011/anatolir201105528/159470802-jurist-avatar-icon-flat-style.jpg?ver\u003d6"
-                            alt=""
-                            className="avatar"
-                        />
+                        <Link to="/users" style={{ textDecoration: 'none' }}>
+                            <img
+                                src="https://us.123rf.com/450wm/anatolir/anatolir2011/anatolir201105528/159470802-jurist-avatar-icon-flat-style.jpg?ver\u003d6"
+                                alt=""
+                                className="avatar"
+                            />
+                        </Link>
                         <div className="listTitle" style={{ marginLeft: '10px' }}>
                             Hi, {username}
                         </div>

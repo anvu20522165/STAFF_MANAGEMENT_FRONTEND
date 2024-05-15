@@ -20,35 +20,14 @@ import Paper from '@mui/material/Paper';
 import 'react-datepicker/dist/react-datepicker.css';
 const SingleMultiTask = (item) => {
     const { multiTaskId } = useParams(); //lấy id từ url
-    const [username, setUsername] = useState('');
-    const [fullname, setFullname] = useState('');
-    const [email, setEmail] = useState('');
-    const [birth, setBirth] = useState(new Date());
+    const [myDepartment, setMyDepartment] = useState('');
 
-    const [gender, setGender] = useState();
-    const [phone, setPhone] = useState('');
-    const [position, setPosition] = useState();
-    const [department, setDepartment] = useState();
-    const [avt, setAvt] = useState('');
-    const navigate = useNavigate();
     const [token, setToken] = useState('');
 
     const [requestDepartment, setRequestDepartment] = useState();
     const [title, setTitle] = useState('');
     const [status, setStatus] = useState('');
     const [tasks, setTasks] = useState([]);
-    const [createdAt, setCreatedAt] = useState(new Date());
-
-    const genders = [
-        { value: 'MALE', label: 'Nam' },
-        { value: 'FEMALE', label: 'Nữ' },
-    ];
-
-    const positions = [
-        { value: 'CEO', label: 'Giám đốc điều hành' },
-        { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
-        { value: 'NHAN_VIEN', label: 'Nhân viên' },
-    ];
 
     const departments = [
         { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
@@ -90,7 +69,9 @@ const SingleMultiTask = (item) => {
             try {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 setToken(accessToken);
+
                 const decodedToken = jwtDecode(accessToken);
+                setMyDepartment(decodedToken.department);
                 let curTime = Date.now() / 1000;
                 if (decodedToken.exp < curTime) {
                     window.location.replace('/login');
@@ -205,7 +186,8 @@ const SingleMultiTask = (item) => {
 
                                                 <TableCell className={styles.tableCell + ' text-center'}>
                                                     <div className={styles.cellAction}>
-                                                        {item.status == false ? (
+                                                        {item.status == false &&
+                                                        myDepartment == item.department.value ? (
                                                             <Button
                                                                 onClick={() => updateStatus(item._id)}
                                                                 style={{ borderRadius: 5, background: 'green' }}

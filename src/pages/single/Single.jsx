@@ -77,13 +77,17 @@ const Single = (item) => {
                 console.log(error);
             });
     };
-
+    const [departmentHead, setDepartmentHead] = useState('');
+    const [departmentHR, setDepartmentHR] = useState('');
     useEffect(() => {
         async function checkAuth() {
             try {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 setToken(accessToken);
+
                 const decodedToken = jwtDecode(accessToken);
+                setDepartmentHead(decodedToken.position);
+                setDepartmentHR(decodedToken.department);
                 let curTime = Date.now() / 1000;
                 if (decodedToken.exp < curTime) {
                     window.location.replace('/login');
@@ -294,23 +298,23 @@ const Single = (item) => {
                                         />
                                     </div>
                                 </div>
-                                <Button
-                                    onClick={() => updateUser(userId, token)}
-                                    style={{ borderRadius: 5, background: 'green' }}
-                                >
-                                    {' '}
-                                    Cập nhật{' '}
-                                </Button>
+                                {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
+                                    <Button
+                                        onClick={() => updateUser(userId, token)}
+                                        style={{ borderRadius: 5, background: 'green' }}
+                                    >
+                                        {' '}
+                                        Cập nhật{' '}
+                                    </Button>
+                                ) : (
+                                    <div></div>
+                                )}
                             </div>
                         </div>
                     </div>
                     <div className="right">
                         <h1 className="title">Thông Báo Cá Nhân</h1>
                     </div>
-                </div>
-                <div className="bottom">
-                    <h1 className="title">Lịch làm việc</h1>
-                    <List />
                 </div>
             </div>
         </div>

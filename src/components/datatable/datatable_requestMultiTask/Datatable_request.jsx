@@ -25,9 +25,7 @@ const Datatable_request = () => {
         return params.position;
     });
 
-    const [department, setDepartment] = useState(() => {
-        return params.department;
-    });
+    const [department, setDepartment] = useState('');
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
     const positions = [
         { value: '', label: 'Tất cả' },
@@ -57,8 +55,7 @@ const Datatable_request = () => {
         return params.email;
     });
     const [tableDataSVT, setTableDataSVT] = useState([]);
-    const [isAdmin, setIsAdmin] = useState(false);
-
+    const [departmentHead, setDepartmentHead] = useState('');
     //Pagination
     const [svtPerPage, setSvtPerPage] = useState(6);
     const [CsvtPerPage, setCSvtPerPage] = useState(1);
@@ -73,6 +70,21 @@ const Datatable_request = () => {
     };
 
     useEffect(() => {
+        async function checkAuth() {
+            try {
+                const accessToken = await AsyncStorage.getItem('accessToken');
+                const decodedToken = jwtDecode(accessToken);
+                setDepartmentHead(decodedToken.position);
+                setDepartment(decodedToken.department);
+                let curTime = Date.now() / 1000;
+                if (decodedToken.exp < curTime) {
+                    window.location.replace('/login');
+                }
+            } catch (error) {
+                console.log('lỗi cmnr');
+            }
+        }
+        checkAuth();
         loadSVT();
     }, []);
 
@@ -83,36 +95,40 @@ const Datatable_request = () => {
             position: position || '',
             department: department || '',
         };
+
         let url = `http://localhost:5555/v1/request/?`;
-
-        //check username
-        if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
-            url = url + `username=${searchData.usernameSearch}`;
-        } else {
-            url = url + `username=`;
-            setUsername('');
-        }
-
-        //check email
-        if (searchData.emailSearch !== undefined && searchData.emailSearch !== 'undefined') {
-            url = url + `&email=${searchData.emailSearch}`;
-        } else {
-            url = url + `&email=`;
-            setEmail('');
-        }
-        //check position
-        url = url + `&position=${searchData.position}`;
-
         //check department
-        url = url + `&department=${searchData.department}`;
+        url = url + `department=${searchData.department}`;
+        // //check username
+        // if (searchData.usernameSearch !== undefined && searchData.usernameSearch !== 'undefined') {
+        //     url = url + `username=${searchData.usernameSearch}`;
+        // } else {
+        //     url = url + `username=`;
+        //     setUsername('');
+        // }
+
+        // //check email
+        // if (searchData.emailSearch !== undefined && searchData.emailSearch !== 'undefined') {
+        //     url = url + `&email=${searchData.emailSearch}`;
+        // } else {
+        //     url = url + `&email=`;
+        //     setEmail('');
+        // }
+        // //check position
+        // url = url + `&position=${searchData.position}`;
 
         return url;
     }
 
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
-        const url = buildSearchURL();
+        const decodedToken = jwtDecode(accessToken);
 
+        let url = `http://localhost:5555/v1/request/?`;
+        //check department
+        url = url + `department=${decodedToken.department}`;
+        // const url = buildSearchURL();
+        console.log(url);
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
@@ -138,23 +154,24 @@ const Datatable_request = () => {
         navigate(`/requests/add`);
     }
 
-    useEffect(() => {
-        async function checkAuth() {
-            try {
-                const accessToken = await AsyncStorage.getItem('accessToken');
-                const decodedToken = jwtDecode(accessToken);
-                setIsAdmin(decodedToken.isAdmin);
-                let curTime = Date.now() / 1000;
-                if (decodedToken.exp < curTime) {
-                    window.location.replace('/login');
-                }
-            } catch (error) {
-                console.log('lỗi cmnr');
-            }
-        }
-        checkAuth();
-        loadSVT();
-    }, []);
+    // useEffect(() => {
+    //     async function checkAuth() {
+    //         try {
+    //             const accessToken = await AsyncStorage.getItem('accessToken');
+    //             const decodedToken = jwtDecode(accessToken);
+    //             setIsAdmin(decodedToken.isAdmin);
+    //             setDepartment(decodedToken.department);
+    //             let curTime = Date.now() / 1000;
+    //             if (decodedToken.exp < curTime) {
+    //                 window.location.replace('/login');
+    //             }
+    //         } catch (error) {
+    //             console.log('lỗi cmnr');
+    //         }
+    //     }
+    //     checkAuth();
+    //     loadSVT();
+    // }, []);
 
     const declineRequest = async (id) => {
         const accessToken = await AsyncStorage.getItem('accessToken');
@@ -180,7 +197,7 @@ const Datatable_request = () => {
                     <b>Danh Sách Yêu Cầu</b>
                 </div>
 
-                {isAdmin == true ? (
+                {departmentHead == 'TRUONG_PHONG' ? (
                     <div style={{ marginBottom: 10 }}>
                         <Button
                             onClick={() => addNewRequest()}
@@ -234,7 +251,7 @@ const Datatable_request = () => {
                                         )}
 
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.isApproved == 'Pending' ? (
+                                            {item.isApproved == 'Pending' && department === 'BAN_GIAM_DOC' ? (
                                                 <div className={styles.cellAction}>
                                                     <Button
                                                         onClick={() => approveRequest(item._id)}
