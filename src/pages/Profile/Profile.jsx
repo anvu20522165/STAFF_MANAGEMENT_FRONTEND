@@ -1,8 +1,7 @@
-import './single.scss';
+import styles from './Profile.scss';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
-import Chart from '../../components/chart/Chart';
-import List from '../../components/table/Table';
+
 import { jwtDecode } from 'jwt-decode';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,16 +12,16 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
-const Single = (item) => {
+const Profile = (item) => {
     const { userId } = useParams(); //lấy id từ url
     const [username, setUsername] = useState('');
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
     const [birth, setBirth] = useState(new Date());
+    const [userIdCheck, setUserIdCheck] = useState();
 
     const [gender, setGender] = useState();
     const [phone, setPhone] = useState('');
-    const [cccd, setCccd] = useState('');
     const [position, setPosition] = useState();
     const [department, setDepartment] = useState();
     const [avt, setAvt] = useState('');
@@ -62,7 +61,8 @@ const Single = (item) => {
                 let dataGender = genders.find((i) => i.value == response.data.gender);
                 console.log(response.data.birth);
                 const formatDate = format(response.data.birth, 'MM/dd/yyyy h:mm aa');
-                setCccd(response.data.cccd);
+
+                console.log('format date', formatDate);
 
                 setBirth(response.data.birth);
                 setGender(dataGender);
@@ -76,8 +76,6 @@ const Single = (item) => {
                 console.log(error);
             });
     };
-    const [departmentHead, setDepartmentHead] = useState('');
-    const [departmentHR, setDepartmentHR] = useState('');
     useEffect(() => {
         async function checkAuth() {
             try {
@@ -85,8 +83,8 @@ const Single = (item) => {
                 setToken(accessToken);
 
                 const decodedToken = jwtDecode(accessToken);
-                setDepartmentHead(decodedToken.position);
-                setDepartmentHR(decodedToken.department);
+                setUserIdCheck(decodedToken.id);
+
                 let curTime = Date.now() / 1000;
                 if (decodedToken.exp < curTime) {
                     window.location.replace('/login');
@@ -105,7 +103,6 @@ const Single = (item) => {
             fullname: fullname,
             email: email,
             avt: avt,
-            cccd: cccd,
             phone: phone,
             gender: gender.value,
             birth: birth,
@@ -117,10 +114,10 @@ const Single = (item) => {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
-                window.location.replace(`/users/${userId}`);
+                window.location.replace(`/users/profile/${userId}`);
             })
             .catch((error) => {
-                window.alert("You don't have the permission to fulfill this action");
+                window.alert('Đã có lỗi xảy ra!');
             });
     };
 
@@ -168,6 +165,7 @@ const Single = (item) => {
                                             type="text"
                                             placeholder="Enter your username"
                                             onChange={(e) => setUsername(e.target.value)}
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -188,6 +186,7 @@ const Single = (item) => {
                                             type="text"
                                             placeholder="Enter your name"
                                             onChange={(e) => setFullname(e.target.value)}
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -208,56 +207,58 @@ const Single = (item) => {
                                             type="text"
                                             placeholder="Enter your email"
                                             onChange={(e) => setEmail(e.target.value)}
+                                            disabled
                                         />
                                     </div>
                                 </div>
-                                {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
-                                    <div>
-                                        <div className="detailItem">
-                                            <div className="itemKey">SĐT:</div>
-                                            <div className="itemValue">
-                                                <input
-                                                    style={{
-                                                        padding: 10,
-                                                        borderColor: '#D0D0D0',
-                                                        borderWidth: 2,
-                                                        marginTop: 5,
-                                                        marginLeft: 5,
-                                                        borderRadius: 5,
-                                                        fontSize: 15,
-                                                    }}
-                                                    value={phone}
-                                                    type="text"
-                                                    placeholder="Enter your phone"
-                                                    onChange={(e) => setPhone(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="detailItem">
-                                            <div className="itemKey">CCCD/ CMND:</div>
-                                            <div className="itemValue">
-                                                <input
-                                                    style={{
-                                                        padding: 10,
-                                                        borderColor: '#D0D0D0',
-                                                        borderWidth: 2,
-                                                        marginTop: 5,
-                                                        marginLeft: 5,
-                                                        borderRadius: 5,
-                                                        fontSize: 15,
-                                                    }}
-                                                    value={cccd}
-                                                    type="text"
-                                                    placeholder="Enter your CCCD"
-                                                    onChange={(e) => setCccd(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
+                                <div className="detailItem">
+                                    <div className="itemKey">CCCD:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                            }}
+                                            value={email}
+                                            type="text"
+                                            placeholder="Enter your email"
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            disabled
+                                        />
                                     </div>
-                                ) : (
-                                    <div></div>
-                                )}
-
+                                </div>
+                                <div className="detailItem">
+                                    <div className="itemKey">SĐT:</div>
+                                    <div className="itemValue">
+                                        <input
+                                            style={{
+                                                padding: 10,
+                                                borderColor: '#D0D0D0',
+                                                borderWidth: 2,
+                                                marginTop: 5,
+                                                marginLeft: 5,
+                                                borderRadius: 5,
+                                                fontSize: 15,
+                                            }}
+                                            value={phone}
+                                            type="text"
+                                            placeholder="Enter your phone"
+                                            onChange={(e) => setPhone(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="right">
+                        <h1 className="title">Thông Báo Cá Nhân</h1>
+                        <div className="item">
+                            <div className="details">
                                 <div className="detailItem">
                                     <div className="itemKey">Giới tính:</div>
                                     <div className="itemValue">
@@ -278,6 +279,7 @@ const Single = (item) => {
                                             showMonthDropdown
                                             showYearDropdown
                                             scrollableYearDropdown
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -285,24 +287,14 @@ const Single = (item) => {
                                     <div className="itemKey">Phòng ban:</div>
                                     <div className="itemValue">
                                         {department && (
-                                            <Select
-                                                defaultValue={department}
-                                                onChange={setDepartment}
-                                                options={departments}
-                                            />
+                                            <Select defaultValue={department} onChange={setDepartment} disabled />
                                         )}
                                     </div>
                                 </div>
                                 <div className="detailItem">
                                     <div className="itemKey">Chức vụ:</div>
                                     <div className="itemValue">
-                                        {position && (
-                                            <Select
-                                                defaultValue={position}
-                                                onChange={setPosition}
-                                                options={positions}
-                                            />
-                                        )}
+                                        {position && <Select defaultValue={position} onChange={setPosition} disabled />}
                                     </div>
                                 </div>
                                 <div className="detailItem">
@@ -325,7 +317,7 @@ const Single = (item) => {
                                         />
                                     </div>
                                 </div>
-                                {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
+                                {userId == userIdCheck ? (
                                     <Button
                                         onClick={() => updateUser(userId, token)}
                                         style={{ borderRadius: 5, background: 'green' }}
@@ -339,13 +331,10 @@ const Single = (item) => {
                             </div>
                         </div>
                     </div>
-                    <div className="right">
-                        <h1 className="title">Thông Báo Cá Nhân</h1>
-                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default Single;
+export default Profile;

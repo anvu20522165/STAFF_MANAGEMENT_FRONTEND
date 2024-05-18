@@ -38,7 +38,6 @@ const Datatable_request = () => {
     const [selectedDepartment, setSelectedDepartment] = useState({ value: '', label: 'Tất cả' });
     const departments = [
         { value: '', label: 'Tất cả' },
-        { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
         { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
         { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
         { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
@@ -120,18 +119,37 @@ const Datatable_request = () => {
         return url;
     }
 
+    const getMultitaskDetail = async (id) => {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        console.log(id);
+        let url = `http://localhost:5555/v1/multiTask/byrequest/${id}`;
+        console.log(url);
+        axios
+            .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+            .then((response) => {
+                // navigate(`/multiTask/${response.data.id}`);
+                console.log(response.data);
+                const multiTaskId = response.data._id;
+                navigate(`/multiTask/${multiTaskId}`);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
     const loadSVT = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const decodedToken = jwtDecode(accessToken);
-
+        console.log(decodedToken);
         let url = `http://localhost:5555/v1/request/?`;
         //check department
         url = url + `department=${decodedToken.department}`;
+        url = url + `&userid=${decodedToken.id}`;
         // const url = buildSearchURL();
         console.log(url);
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
+                console.log(response.data);
                 setTableDataSVT(response.data);
             })
             .catch((error) => {
@@ -197,18 +215,14 @@ const Datatable_request = () => {
                     <b>Danh Sách Yêu Cầu</b>
                 </div>
 
-                {departmentHead == 'TRUONG_PHONG' ? (
-                    <div style={{ marginBottom: 10 }}>
-                        <Button
-                            onClick={() => addNewRequest()}
-                            style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
-                        >
-                            Thêm Yêu Cầu
-                        </Button>
-                    </div>
-                ) : (
-                    <div style={{ marginBottom: 10 }}></div>
-                )}
+                <div style={{ marginBottom: 10 }}>
+                    <Button
+                        onClick={() => addNewRequest()}
+                        style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
+                    >
+                        Thêm Yêu Cầu
+                    </Button>
+                </div>
 
                 <TableContainer component={Paper} className={styles.table}>
                     <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
@@ -251,7 +265,9 @@ const Datatable_request = () => {
                                         )}
 
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.isApproved == 'Pending' && department === 'BAN_GIAM_DOC' ? (
+                                            {item.isApproved == 'Pending' &&
+                                            department === 'BAN_GIAM_DOC' &&
+                                            departmentHead === 'TRUONG_PHONG' ? (
                                                 <div className={styles.cellAction}>
                                                     <Button
                                                         onClick={() => approveRequest(item._id)}
@@ -267,7 +283,19 @@ const Datatable_request = () => {
                                                     </Button>
                                                 </div>
                                             ) : (
-                                                <div>Không có</div>
+                                                <div></div>
+                                            )}
+                                            {item.isApproved == 'Approved' ? (
+                                                <div className={styles.cellAction}>
+                                                    <Button
+                                                        onClick={() => getMultitaskDetail(item._id)}
+                                                        className={styles.editButton}
+                                                    >
+                                                        Xem
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div></div>
                                             )}
                                         </TableCell>
                                     </TableRow>

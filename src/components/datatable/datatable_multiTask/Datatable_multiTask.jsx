@@ -31,18 +31,10 @@ const Datatable_multiTask = () => {
         return params.department;
     });
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
-    const positions = [
-        { value: '', label: 'Tất cả' },
-        { value: 'QUAN_LY', label: 'Quản lý' },
-        { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
-        { value: 'PHO_PHONG', label: 'Phó phòng' },
-        { value: 'NHAN_VIEN', label: 'Nhân viên' },
-    ];
 
     const [selectedDepartment, setSelectedDepartment] = useState({ value: '', label: 'Tất cả' });
     const departments = [
         { value: '', label: 'Tất cả' },
-        { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
         { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
         { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
         { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
@@ -190,7 +182,7 @@ const Datatable_multiTask = () => {
                 <div className={styles.datatableTitle}>
                     <b>Danh Sách Yêu Cầu Liên Đơn Vị</b>
                 </div>
-                <b>Chào trưởng phòng {greeting}</b>
+                <b>Nơi xử lý yêu cầu đơn vị của chức vụ Trưởng Phòng</b>
                 <TableContainer component={Paper} className={styles.table}>
                     <Table sx={{ minWidth: 1200 }} aria-label="a dense table">
                         <TableHead>

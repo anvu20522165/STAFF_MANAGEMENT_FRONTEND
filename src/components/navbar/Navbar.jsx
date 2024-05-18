@@ -8,6 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Navbar = () => {
     const { dispatch } = useContext(DarkModeContext);
     const [username, setUsername] = useState('');
+    const [userId, setUserId] = useState();
+    const [avt, setAvt] = useState();
+
     //if token is still valid then redirect to home screen
     useEffect(() => {
         async function checkAuth() {
@@ -15,7 +18,8 @@ const Navbar = () => {
                 const accessToken = await AsyncStorage.getItem('accessToken');
                 const refreshToken = await AsyncStorage.getItem('refreshToken');
                 const decodedToken = jwtDecode(accessToken);
-                // console.log(decodedToken)
+                setUserId(decodedToken.id);
+                setAvt(decodedToken.avt);
                 let curTime = Date.now() / 1000;
                 if (decodedToken.exp < curTime) {
                     console.log('need to refresh token');
@@ -43,12 +47,8 @@ const Navbar = () => {
                     </div>
 
                     <div className="item">
-                        <Link to="/users" style={{ textDecoration: 'none' }}>
-                            <img
-                                src="https://us.123rf.com/450wm/anatolir/anatolir2011/anatolir201105528/159470802-jurist-avatar-icon-flat-style.jpg?ver\u003d6"
-                                alt=""
-                                className="avatar"
-                            />
+                        <Link to={`/users/profile/${userId}`} style={{ textDecoration: 'none' }}>
+                            <img src={`${avt}`} alt="" className="avatar" />
                         </Link>
                         <div className="listTitle" style={{ marginLeft: '10px' }}>
                             Hi, {username}

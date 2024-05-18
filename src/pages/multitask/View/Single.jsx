@@ -21,9 +21,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 const SingleMultiTask = (item) => {
     const { multiTaskId } = useParams(); //lấy id từ url
     const [myDepartment, setMyDepartment] = useState('');
+    const [myPosition, setMyPosition] = useState('');
 
     const [token, setToken] = useState('');
-
+    const [requestUserFullname, setRequestUserFullname] = useState();
+    const [requestPosition, setRequestPosition] = useState();
     const [requestDepartment, setRequestDepartment] = useState();
     const [title, setTitle] = useState('');
     const [status, setStatus] = useState('');
@@ -38,6 +40,14 @@ const SingleMultiTask = (item) => {
         { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
         { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
     ];
+    const positions = [
+        { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
+        { value: 'NHAN_VIEN', label: 'Nhân viên' },
+    ];
+    const mapValuePositionToLabel = (value) => {
+        const position = positions.find((dept) => dept.value === value);
+        return position ? position.label : '';
+    };
     const mapValueToLabel = (value) => {
         const department = departments.find((dept) => dept.value === value);
         return department ? department.label : '';
@@ -52,12 +62,26 @@ const SingleMultiTask = (item) => {
             })
             .then((response) => {
                 //Set default values
-                console.log(response.data);
                 setRequestDepartment(mapValueToLabel(response.data.requestid.department));
+                getUserInfo(response.data.requestid.userid);
                 setStatus(response.data.status);
                 setTasks(response.data.tasks);
                 // setCreatedAt(response.data.createdAt);
                 setTitle(response.data.requestid.title);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const getUserInfo = async (userId) => {
+        axios
+            .get(`http://localhost:5555/v1/user/${userId}`)
+            .then((response) => {
+                //Set default values
+                console.log(response.data);
+                setRequestUserFullname(response.data.fullname);
+                setRequestPosition(mapValuePositionToLabel(response.data.position));
             })
             .catch((error) => {
                 console.log(error);
@@ -72,6 +96,7 @@ const SingleMultiTask = (item) => {
 
                 const decodedToken = jwtDecode(accessToken);
                 setMyDepartment(decodedToken.department);
+                setMyPosition(decodedToken.position);
                 let curTime = Date.now() / 1000;
                 if (decodedToken.exp < curTime) {
                     window.location.replace('/login');
@@ -112,16 +137,20 @@ const SingleMultiTask = (item) => {
                         <div className="item">
                             <div className="details">
                                 <div className="detailItem">
-                                    <div className="itemKey">From Department:</div>
+                                    <div className="itemKey">Yêu cầu từ:</div>
                                     <div className="itemValue" style={{ margin: 10 }}>
-                                        {requestDepartment}
+                                        {requestUserFullname}
                                     </div>
-                                    <div className="itemKey">Request:</div>
+                                    <div className="itemKey">Chức vụ và Phòng ban:</div>
+                                    <div className="itemValue" style={{ margin: 10 }}>
+                                        {requestPosition} - {requestDepartment}
+                                    </div>
+                                    <div className="itemKey">Yêu cầu:</div>
                                     <div className="itemValue" style={{ margin: 10 }}>
                                         {title}
                                     </div>
 
-                                    <div className="itemKey">Status:</div>
+                                    <div className="itemKey">Trạng thái:</div>
                                     <div className="itemValue" style={{ margin: 10 }}>
                                         {status}
                                     </div>
@@ -187,7 +216,8 @@ const SingleMultiTask = (item) => {
                                                 <TableCell className={styles.tableCell + ' text-center'}>
                                                     <div className={styles.cellAction}>
                                                         {item.status == false &&
-                                                        myDepartment == item.department.value ? (
+                                                        myDepartment == item.department.value &&
+                                                        myPosition == 'TRUONG_PHONG' ? (
                                                             <Button
                                                                 onClick={() => updateStatus(item._id)}
                                                                 style={{ borderRadius: 5, background: 'green' }}

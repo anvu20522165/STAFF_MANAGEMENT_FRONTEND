@@ -18,6 +18,7 @@ import Password from './pages/users/Password/Password';
 import List_request from './pages/list/list_request/List_request';
 import List_multiTask from './pages/list/list_multiTask/List_multiTask';
 import SingleMultiTask from './pages/multitask/View/Single';
+import Profile from './pages/Profile/Profile';
 function App() {
     const { darkMode } = useContext(DarkModeContext);
     return (
@@ -38,6 +39,7 @@ function App() {
                             <Route index element={<List_user />} />
                             <Route path=":userId" element={<Single />} />
                             <Route path="add" element={<Add />} />
+                            <Route path="profile/:userId" element={<Profile />} />
                             <Route path="changePassword/:userId" element={<Password />} />
                         </Route>
                         <Route path="requests">

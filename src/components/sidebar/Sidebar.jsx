@@ -79,27 +79,6 @@ const Sidebar = () => {
                             <span>Nhân viên</span>
                         </li>
                     </Link>
-                    <Link to="/users" style={{ textDecoration: 'none' }}>
-                        <li>
-                            <AssignmentIndIcon className="icon" />
-                            <span>Chức vụ</span>
-                        </li>
-                    </Link>
-                    <Link to="/users" style={{ textDecoration: 'none' }}>
-                        <li>
-                            <HomeIcon className="icon" />
-                            <span>Phòng ban</span>
-                        </li>
-                    </Link>
-
-                    <p className="title">Phân Tích</p>
-
-                    <Link to="/feedbacks" style={{ textDecoration: 'none' }}>
-                        <li>
-                            <FeedbackIcon className="icon" />
-                            <span>Feedback</span>
-                        </li>
-                    </Link>
 
                     <p className="title">Lựa Chọn</p>
 
