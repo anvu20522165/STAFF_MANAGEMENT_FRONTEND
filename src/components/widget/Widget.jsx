@@ -36,11 +36,13 @@ const Widget = ({ type }) => {
         let url = `http://localhost:5555/v1/request/?`;
         //check department
         // const url = buildSearchURL();
+        url = url + `department=${decodedToken.department}`;
+        url = url + `&userid=${decodedToken.id}`;
         console.log(url);
         axios
             .get(url, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
-                console.log(response.data);
+                console.log(response.data.length);
                 setRequestNumber(response.data.length);
             })
             .catch((error) => {

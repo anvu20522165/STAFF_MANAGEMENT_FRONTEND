@@ -14,7 +14,7 @@ import styles from './datatable_request.module.css';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import queryString from 'query-string';
-import Select from 'react-select';
+import { format } from 'date-fns';
 const Datatable_request = () => {
     const location = useLocation();
     const params = queryString.parse(location.search);
@@ -27,13 +27,6 @@ const Datatable_request = () => {
 
     const [department, setDepartment] = useState('');
     const [selectedPosition, setSelectedPosition] = useState({ value: '', label: 'Tất cả' });
-    const positions = [
-        { value: '', label: 'Tất cả' },
-        { value: 'QUAN_LY', label: 'Quản lý' },
-        { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
-        { value: 'PHO_PHONG', label: 'Phó phòng' },
-        { value: 'NHAN_VIEN', label: 'Nhân viên' },
-    ];
 
     const [selectedDepartment, setSelectedDepartment] = useState({ value: '', label: 'Tất cả' });
     const departments = [
@@ -246,7 +239,7 @@ const Datatable_request = () => {
                                             {item.title}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            {item.createdAt}
+                                            {format(item.createdAt, 'MM/dd/yyyy kk:mm:ss')}
                                         </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
                                             {mapValueToLabel(item.department)}

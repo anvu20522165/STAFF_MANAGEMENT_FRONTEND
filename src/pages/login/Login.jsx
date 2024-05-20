@@ -55,7 +55,7 @@ const Login = () => {
     };
     return (
         <section className="login-container">
-            <div className="login-title"> Log in</div>
+            <div className="login-title"> Đăng nhập</div>
             <form onSubmit={handleLogin}>
                 <label>USERNAME</label>
                 <input type="text" placeholder="Enter your username" onChange={(e) => setUsername(e.target.value)} />
@@ -67,9 +67,9 @@ const Login = () => {
                 />
                 <button type="submit"> Continue </button>
             </form>
-            <div className="login-register"> Forget your password? </div>
+            <div className="login-register"> Quên mật khẩu? </div>
             <Link className="login-register-link" to="/register">
-                Click here to change{' '}
+                Bấm để đổi mật khẩu{' '}
             </Link>
         </section>
     );

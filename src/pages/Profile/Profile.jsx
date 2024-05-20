@@ -19,6 +19,7 @@ const Profile = (item) => {
     const [email, setEmail] = useState('');
     const [birth, setBirth] = useState(new Date());
     const [userIdCheck, setUserIdCheck] = useState();
+    const [cccd, setCccd] = useState(null);
 
     const [gender, setGender] = useState();
     const [phone, setPhone] = useState('');
@@ -61,7 +62,7 @@ const Profile = (item) => {
                 let dataGender = genders.find((i) => i.value == response.data.gender);
                 console.log(response.data.birth);
                 const formatDate = format(response.data.birth, 'MM/dd/yyyy h:mm aa');
-
+                setCccd(response.data.cccd);
                 console.log('format date', formatDate);
 
                 setBirth(response.data.birth);
@@ -224,10 +225,10 @@ const Profile = (item) => {
                                                 borderRadius: 5,
                                                 fontSize: 15,
                                             }}
-                                            value={email}
+                                            value={cccd}
                                             type="text"
                                             placeholder="Enter your email"
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={(e) => setCccd(e.target.value)}
                                             disabled
                                         />
                                     </div>
@@ -256,7 +257,6 @@ const Profile = (item) => {
                         </div>
                     </div>
                     <div className="right">
-                        <h1 className="title">Thông Báo Cá Nhân</h1>
                         <div className="item">
                             <div className="details">
                                 <div className="detailItem">

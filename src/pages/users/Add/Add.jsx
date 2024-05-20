@@ -13,6 +13,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const Add = () => {
     const [username, setUsername] = useState(null);
     const [fullname, setFullname] = useState('');
+    const [cccd, setCccd] = useState(null);
     const [email, setEmail] = useState(null);
     const [birth, setBirth] = useState(new Date());
     const [gender, setGender] = useState({ value: 'MALE', label: 'Nam' });
@@ -66,6 +67,7 @@ const Add = () => {
                 username: username,
                 fullname: fullname,
                 password: password,
+                cccd: cccd,
                 email: email,
                 phone: phone,
                 gender: gender.value,
@@ -114,7 +116,7 @@ const Add = () => {
                                                 fontSize: 15,
                                             }}
                                             type="text"
-                                            placeholder="Enter your username"
+                                            placeholder="Nhập username"
                                             onChange={(e) => setUsername(e.target.value)}
                                         />
                                     </div>
@@ -132,7 +134,7 @@ const Add = () => {
                                             }}
                                             value={password}
                                             type="text"
-                                            placeholder="Enter your password"
+                                            placeholder="Nhập password"
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
                                     </div>
@@ -151,11 +153,11 @@ const Add = () => {
                                                 fontSize: 15,
                                             }}
                                             type="text"
-                                            placeholder="Enter your name"
+                                            placeholder="Nhập họ tên"
                                             onChange={(e) => setFullname(e.target.value)}
                                         />
                                     </div>
-                                    <div className="itemKey">Mật khẩu:</div>
+                                    <div className="itemKey">CCCD:</div>
                                     <div className="itemValue">
                                         <input
                                             style={{
@@ -167,10 +169,10 @@ const Add = () => {
                                                 borderRadius: 5,
                                                 fontSize: 15,
                                             }}
-                                            value={password}
+                                            value={cccd}
                                             type="text"
-                                            placeholder="Enter your password"
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Nhập căn cước công dân"
+                                            onChange={(e) => setCccd(e.target.value)}
                                         />
                                     </div>
                                 </div>
@@ -188,7 +190,7 @@ const Add = () => {
                                                 fontSize: 15,
                                             }}
                                             type="text"
-                                            placeholder="Enter your email"
+                                            placeholder="Nhập email"
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
                                     </div>
@@ -207,7 +209,7 @@ const Add = () => {
                                                 fontSize: 15,
                                             }}
                                             type="text"
-                                            placeholder="Enter your phone"
+                                            placeholder="Nhập SĐT"
                                             onChange={(e) => setPhone(e.target.value)}
                                         />
                                     </div>

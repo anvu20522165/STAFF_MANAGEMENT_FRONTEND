@@ -21,7 +21,6 @@ const AddTask = () => {
     const [duplicateDepartment, setDuplicateDepartment] = useState(null);
 
     const departments = [
-        { value: 'BAN_QUAN_LY', label: 'Ban Quản lý' },
         { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
         { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
         { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
@@ -178,28 +177,77 @@ const AddTask = () => {
                                         />
                                     </div>
                                 </div>
-                                <div className="itemKey">Tạo các tác vụ liên đơn vị:</div>
-                                <button onClick={handleClick}>Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="right">
+                        <h1 className="title">Tạo các tác vụ liên đơn vị:</h1>
+                        <div className="item">
+                            <div className="details">
+                                <button
+                                    style={{
+                                        padding: 5,
+                                        backgroundColor: 'rgb(43, 150, 196)',
+                                        color: 'white',
+                                        fontSize: 14,
+                                        maxHeight: 40,
+                                        border: '1px dotted rgba(36, 214, 234, 0.6)',
+                                        borderRadius: 5,
+                                    }}
+                                    onClick={handleClick}
+                                >
+                                    Thêm tác vụ
+                                </button>
                                 {data.map((val, i) => (
-                                    <div>
-                                        <Select
-                                            defaultValue={duplicateDepartment}
-                                            onChange={(option) => handleDepartmentChange(option, i)}
-                                            options={departments}
-                                            name="department"
-                                            value={val.department}
-                                        />
-
+                                    <div style={{ display: 'flex', margin: 15 }}>
                                         <div>
-                                            <input name="name" value={val.name} onChange={(e) => handleChange(e, i)} />
+                                            <Select
+                                                defaultValue={duplicateDepartment}
+                                                onChange={(option) => handleDepartmentChange(option, i)}
+                                                options={departments}
+                                                name="department"
+                                                value={val.department}
+                                            />
                                         </div>
-
-                                        <button onClick={() => handleDelete(i)}>Delete</button>
+                                        <div>
+                                            <input
+                                                style={{
+                                                    padding: 10,
+                                                    borderColor: '#D0D0D0',
+                                                    borderWidth: 2,
+                                                    marginTop: 5,
+                                                    marginLeft: 5,
+                                                    borderRadius: 5,
+                                                    fontSize: 15,
+                                                }}
+                                                placeholder="Tên tác vụ"
+                                                name="name"
+                                                value={val.name}
+                                                onChange={(e) => handleChange(e, i)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <button
+                                                style={{
+                                                    padding: 5,
+                                                    backgroundColor: 'white',
+                                                    color: 'crimson',
+                                                    fontSize: 14,
+                                                    maxHeight: 40,
+                                                    margin: 30,
+                                                    border: '1px dotted rgba(220, 20, 60, 0.6)',
+                                                    borderRadius: 5,
+                                                }}
+                                                onClick={() => handleDelete(i)}
+                                            >
+                                                X
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                                 <Button onClick={() => create()} style={{ borderRadius: 5, background: 'green' }}>
                                     {' '}
-                                    Thêm{' '}
+                                    Tạo yêu cầu liên đơn vị{' '}
                                 </Button>
                             </div>
                         </div>

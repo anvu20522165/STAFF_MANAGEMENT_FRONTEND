@@ -259,7 +259,7 @@ const Datatable_user = () => {
                             onClick={() => addNewUser()}
                             style={{ background: 'green', fontSize: 15, fontWeight: 'bold' }}
                         >
-                            Thêm NV
+                            Thêm nhân viên
                         </Button>
                     </div>
                 ) : (
