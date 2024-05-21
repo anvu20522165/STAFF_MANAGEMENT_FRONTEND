@@ -49,6 +49,12 @@ const Sidebar = () => {
                     </li>
                     <p className="title">Trang Quản Trị</p>
                     <li>
+                        <Link to="/notice" style={{ textDecoration: 'none' }}>
+                            <AssignmentIcon className="icon" />
+                            <span>Thông báo</span>
+                        </Link>
+                    </li>
+                    <li>
                         <Link to="/announcement" style={{ textDecoration: 'none' }}>
                             <AssignmentIcon className="icon" />
                             <span>Lịch biểu</span>
