@@ -340,7 +340,8 @@ const Single = (item) => {
                         </div>
                     </div>
                     <div className="right">
-                        <h1 className="title">Thông Báo Cá Nhân</h1>
+                        <h1 className="title">Doanh thu: </h1>
+                        <Chart title="Biến động doanh thu" aspect={2 / 1} />
                     </div>
                 </div>
             </div>
