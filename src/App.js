@@ -18,7 +18,12 @@ import Password from './pages/users/Password/Password';
 import List_request from './pages/list/list_request/List_request';
 import List_multiTask from './pages/list/list_multiTask/List_multiTask';
 import SingleMultiTask from './pages/multitask/View/Single';
+<<<<<<< Updated upstream
 import Profile from './pages/Profile/Profile';
+=======
+import Notice from './pages/notice/Notice';
+
+>>>>>>> Stashed changes
 function App() {
     const { darkMode } = useContext(DarkModeContext);
     return (
@@ -27,6 +32,10 @@ function App() {
                 <Routes>
                     <Route path="/">
                         <Route index element={<Home />} />
+
+                        <Route path="notice">
+                            <Route index element={<Notice />} />
+                        </Route>
 
                         <Route path="announcement">
                             <Route index element={<Announcement />} />
