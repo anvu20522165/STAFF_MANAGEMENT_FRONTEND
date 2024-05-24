@@ -20,6 +20,7 @@ import List_multiTask from './pages/list/list_multiTask/List_multiTask';
 import SingleMultiTask from './pages/multitask/View/Single';
 import Profile from './pages/Profile/Profile';
 import Notice from './pages/notice/Notice';
+import Notification from "./pages/notification/Notification";
 
 function App() {
     const { darkMode } = useContext(DarkModeContext);
@@ -32,6 +33,10 @@ function App() {
 
                         <Route path="notice">
                             <Route index element={<Notice />} />
+                        </Route>
+
+                        <Route path="notification">
+                            <Route index element={<Notification />} />
                         </Route>
 
                         <Route path="announcement">
