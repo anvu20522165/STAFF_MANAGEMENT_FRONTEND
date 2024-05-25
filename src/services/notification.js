@@ -35,3 +35,13 @@ export const createNotification = (payload) => {
 export const updateNotification = (id, payload) => {
     return axiosInstance.put(`/notification/${id}`, payload)
 }
+
+/**
+ * call api to delete notification
+ *
+ * @param id
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const deleteNotification = (id) => {
+    return axiosInstance.delete(`/notification/${id}`)
+}

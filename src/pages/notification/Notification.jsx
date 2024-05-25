@@ -3,10 +3,10 @@ import {Button,} from '@mui/material';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import CustomSnackbar from '../../components/customSnackbar/CustomSnackbar';
-import {getAllNotifications} from "../../services/notification";
 import DataTableNotification from "../../components/datatable/datatable_notifications/DataTableNotification";
 import {NotificationType} from "../../constants/notification";
 import ActionDialog from "./components/action-dialog";
+import ConfirmDeleteDialog from "./components/confirm-delete-dialog";
 
 
 const Notification = () => {
@@ -14,14 +14,32 @@ const Notification = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-    const [notifications, setNotifications] = React.useState([])
-
-    // loading states
-    const [isLoadingFetchNotification, setIsLoadingFetchNotification] = React.useState(false)
+    const handleSnackbarOpen = (message, severity) => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setOpenSnackbar(true);
+    };
 
     // ref
+    const deleteConfirmRef = React.useRef({
+        open: () => {
+
+        }
+    })
     const actionDialogRef = React.useRef({
         open: () => {
+        }
+    })
+    const tableInternalRef = React.useRef({
+        reload: () => {
+        }
+    })
+    const tableNotifyRef = React.useRef({
+        reload: () => {
+        }
+    })
+    const tableFelicitationRef = React.useRef({
+        reload: () => {
         }
     })
 
@@ -37,23 +55,42 @@ const Notification = () => {
         setOpenSnackbar(false);
     };
 
+
     /**
-     * fetch all notifications
+     * handle update success
      *
      * @type {(function())|*}
      */
-    const fetchNotifications = React.useCallback(() => {
-        setIsLoadingFetchNotification(true)
-        getAllNotifications().then(({data}) => {
-            setNotifications(data || [])
-        }).finally(() => {
-            setIsLoadingFetchNotification(false)
-        })
+    const handleActionSuccess = React.useCallback(({type}, title) => {
+        handleSnackbarOpen(title || 'Successfully', 'success')
+        switch (type) {
+            case NotificationType.Notify:
+                tableNotifyRef.current?.reload()
+                break
+            case NotificationType.Internal:
+                tableInternalRef.current?.reload()
+                break
+            case NotificationType.Felicitation:
+                tableFelicitationRef.current?.reload()
+                break
+            default:
+                break
+        }
     }, [])
 
+    /**
+     * handle error
+     *
+     * @type {(function(): void)|*}
+     */
+    const handleError = React.useCallback(() => {
+        handleSnackbarOpen('Có lỗi xảy ra', 'error')
+    }, [])
 
+    /**
+     * initial
+     */
     React.useEffect(() => {
-        fetchNotifications()
     }, [])
 
     return (
@@ -80,23 +117,43 @@ const Notification = () => {
                         </Button>
                     </div>
 
+                    {/*region tables*/}
                     <div>
-                        <DataTableNotification className='mb-3' type={NotificationType.Internal}
+                        <DataTableNotification ref={tableInternalRef} className='mb-3'
+                                               type={NotificationType.Internal}
                                                title='Thông tin nội bộ'
-                                               onEdit={actionDialogRef.current?.open}/>
+                                               onEdit={(val) => actionDialogRef.current?.open(val)}
+                                               onDelete={(val) => deleteConfirmRef.current?.open(val)}
+                        />
 
-                        <DataTableNotification className='mb-3' type={NotificationType.Notify}
+                        <DataTableNotification ref={tableNotifyRef} className='mb-3'
+                                               type={NotificationType.Notify}
                                                title='Thông báo'
-                                               onEdit={actionDialogRef.current?.open}/>
+                                               onEdit={(val) => actionDialogRef.current?.open(val)}
+                                               onDelete={(val) => deleteConfirmRef.current?.open(val)}/>
 
-                        <DataTableNotification className='mb-3' type={NotificationType.Felicitation}
+                        <DataTableNotification ref={tableFelicitationRef} className='mb-3'
+                                               type={NotificationType.Felicitation}
                                                title='Khen thưởng'
-                                               onEdit={actionDialogRef.current?.open}/>
+                                               onEdit={(val) => actionDialogRef.current?.open(val)}
+                                               onDelete={(val) => deleteConfirmRef.current?.open(val)}/>
                     </div>
+                    {/*endregion tables*/}
+
                 </div>
             </div>
 
-            <ActionDialog ref={actionDialogRef}/>
+            {/*region dialog*/}
+            <ActionDialog ref={actionDialogRef}
+                          onUpdateSuccess={(val) => handleActionSuccess(val, 'Cập nhật thành công')}
+                          onCreateSuccess={(val) => handleActionSuccess(val, 'Thêm mới thành công')}
+                          onError={handleError}/>
+
+            <ConfirmDeleteDialog ref={deleteConfirmRef}
+                                 onDeleteSuccess={(val) => handleActionSuccess(val, 'Xóa thành công')}
+                                 onError={handleError}
+            />
+            {/*endregion dialog*/}
         </div>
     );
 };
