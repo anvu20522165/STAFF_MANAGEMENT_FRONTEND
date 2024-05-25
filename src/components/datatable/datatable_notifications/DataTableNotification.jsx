@@ -17,7 +17,6 @@ import EditIcon from '@mui/icons-material/Edit';
 
 const DataTableNotification =
     React.forwardRef(({
-                          type,
                           title,
                           className = '',
                           onDelete = () => {
@@ -25,6 +24,7 @@ const DataTableNotification =
                           onEdit = () => {
                           },
                           apiFunc = getAllNotifications,
+                          apiParam,
                           hideActions = false,
                       }, ref) => {
         // state
@@ -58,7 +58,7 @@ const DataTableNotification =
             setCSvtPerPage(1)
             setNotifications([])
             setIsLoadingFetchNotification(true)
-            apiFunc(type).then(({data}) => {
+            apiFunc(apiParam).then(({data}) => {
                 setNotifications(data || [])
             }).finally(() => {
                 setIsLoadingFetchNotification(false)
@@ -84,7 +84,7 @@ const DataTableNotification =
 
         return <>
             <div className={`d-flex flex-column ${className}`}>
-                <h3 className='fw-bold mb-3'>{title || type}</h3>
+                <h3 className='fw-bold mb-3'>{title || apiParam}</h3>
                 <TableContainer component={Paper}>
                     <Table aria-label="a dense table">
                         <TableHead>

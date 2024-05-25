@@ -346,7 +346,7 @@ const Single = (item) => {
                             hideActions
                             title='Thông báo cá nhân'
                             apiFunc={getNotificationsByUserId}
-                            type={userId}
+                            apiParam={userId}
                         />
                     </div>
                 </div>

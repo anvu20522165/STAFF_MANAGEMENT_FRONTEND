@@ -151,7 +151,7 @@ const Notification = () => {
                     <div>
                         <DataTableNotification ref={tableInternalRef} className='mb-3'
                                                hideActions={!actionAble}
-                                               type={NotificationType.Internal}
+                                               apiParam={NotificationType.Internal}
                                                title='Thông tin nội bộ'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
                                                onDelete={(val) => deleteConfirmRef.current?.open(val)}
@@ -159,14 +159,14 @@ const Notification = () => {
 
                         <DataTableNotification ref={tableNotifyRef} className='mb-3'
                                                hideActions={!actionAble}
-                                               type={NotificationType.Notify}
+                                               apiParam={NotificationType.Notify}
                                                title='Thông báo'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
                                                onDelete={(val) => deleteConfirmRef.current?.open(val)}/>
 
                         <DataTableNotification ref={tableFelicitationRef} className='mb-3'
                                                hideActions={!actionAble}
-                                               type={NotificationType.Felicitation}
+                                               apiParam={NotificationType.Felicitation}
                                                title='Khen thưởng'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
                                                onDelete={(val) => deleteConfirmRef.current?.open(val)}/>
