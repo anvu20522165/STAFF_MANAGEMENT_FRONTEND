@@ -8,7 +8,7 @@ import {NotificationType} from "../constants/notification";
  * @param type
  * @returns {Promise<axios.AxiosResponse<any>>}
  */
-export const getAllNotifications = (type) => {
+export const getAllNotifications = (type = undefined) => {
     const query = queryString.stringify({
         ...(Object.values(NotificationType).includes(type) && {type})
     })

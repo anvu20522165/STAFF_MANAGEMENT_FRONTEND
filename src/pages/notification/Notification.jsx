@@ -5,6 +5,7 @@ import Navbar from '../../components/navbar/Navbar';
 import CustomSnackbar from '../../components/customSnackbar/CustomSnackbar';
 import {getAllNotifications} from "../../services/notification";
 import DataTableNotification from "../../components/datatable/datatable_notifications/DataTableNotification";
+import {NotificationType} from "../../constants/notification";
 
 
 const Notification = () => {
@@ -80,9 +81,9 @@ const Notification = () => {
 
             <div className="homeContainer">
                 <Navbar/>
-                <div  className='p-3'>
-                    <div className='d-flex justify-content-between gap-3 mb-3'>
-                        <b>Quản lý thông báo</b>
+                <div className='p-3'>
+                    <div className='d-flex justify-content-between gap-3 mb-3 pb-3 border-bottom'>
+                        <b className='text-secondary fs-3'>Quản lý thông báo</b>
                         <Button
                             style={{borderRadius: 5, background: 'rgb(98, 192, 216)'}}
                             variant="contained"
@@ -92,7 +93,14 @@ const Notification = () => {
                     </div>
 
                     <div>
-                        <DataTableNotification/>
+                        <DataTableNotification className='mb-3' type={NotificationType.Internal}
+                                               title='Thông tin nội bộ'/>
+
+                        <DataTableNotification className='mb-3' type={NotificationType.Notify}
+                                               title='Thông báo'/>
+
+                        <DataTableNotification className='mb-3' type={NotificationType.Felicitation}
+                                               title='Khen thưởng'/>
                     </div>
                 </div>
             </div>
