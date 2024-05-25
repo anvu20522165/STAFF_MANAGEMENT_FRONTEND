@@ -14,3 +14,24 @@ export const getAllNotifications = (type = undefined) => {
     })
     return axiosInstance.get(`/notification/get-all?${query}`)
 }
+
+/**
+ * call api to create new notification
+ *
+ * @param payload
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const createNotification = (payload) => {
+    return axiosInstance.post('/notification/create', payload)
+}
+
+/**
+ * call api to update notification
+ *
+ * @param id
+ * @param payload
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const updateNotification = (id, payload) => {
+    return axiosInstance.put(`/notification/${id}`, payload)
+}

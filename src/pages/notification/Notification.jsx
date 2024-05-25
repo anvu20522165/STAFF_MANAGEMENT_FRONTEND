@@ -6,6 +6,7 @@ import CustomSnackbar from '../../components/customSnackbar/CustomSnackbar';
 import {getAllNotifications} from "../../services/notification";
 import DataTableNotification from "../../components/datatable/datatable_notifications/DataTableNotification";
 import {NotificationType} from "../../constants/notification";
+import ActionDialog from "./components/action-dialog";
 
 
 const Notification = () => {
@@ -18,25 +19,11 @@ const Notification = () => {
     // loading states
     const [isLoadingFetchNotification, setIsLoadingFetchNotification] = React.useState(false)
 
-
-    const columns = [
-        {field: 'id', headerName: 'ID',},
-        {field: 'firstName', headerName: 'First name',},
-        {field: 'lastName', headerName: 'Last name',},
-    ];
-
-    const rows = [
-        {id: 1, lastName: 'Snow', firstName: 'Jon'},
-        {id: 2, lastName: 'Lannister', firstName: 'Cersei'},
-        {id: 3, lastName: 'Lannister', firstName: 'Jaime'},
-        {id: 4, lastName: 'Stark', firstName: 'Arya'},
-        {id: 5, lastName: 'Targaryen', firstName: 'Daenerys',},
-        {id: 6, lastName: 'Melisandre', firstName: null},
-        {id: 7, lastName: 'Clifford', firstName: 'Ferrara'},
-        {id: 8, lastName: 'Frances', firstName: 'Rossini'},
-        {id: 9, lastName: 'Roxie', firstName: 'Harvey'},
-    ];
-
+    // ref
+    const actionDialogRef = React.useRef({
+        open: () => {
+        }
+    })
 
     /**
      * handle snackbar close
@@ -87,6 +74,7 @@ const Notification = () => {
                         <Button
                             style={{borderRadius: 5, background: 'rgb(98, 192, 216)'}}
                             variant="contained"
+                            onClick={() => actionDialogRef.current?.open()}
                         >
                             Thêm mới
                         </Button>
@@ -94,16 +82,21 @@ const Notification = () => {
 
                     <div>
                         <DataTableNotification className='mb-3' type={NotificationType.Internal}
-                                               title='Thông tin nội bộ'/>
+                                               title='Thông tin nội bộ'
+                                               onEdit={actionDialogRef.current?.open}/>
 
                         <DataTableNotification className='mb-3' type={NotificationType.Notify}
-                                               title='Thông báo'/>
+                                               title='Thông báo'
+                                               onEdit={actionDialogRef.current?.open}/>
 
                         <DataTableNotification className='mb-3' type={NotificationType.Felicitation}
-                                               title='Khen thưởng'/>
+                                               title='Khen thưởng'
+                                               onEdit={actionDialogRef.current?.open}/>
                     </div>
                 </div>
             </div>
+
+            <ActionDialog ref={actionDialogRef}/>
         </div>
     );
 };

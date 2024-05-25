@@ -10,10 +10,20 @@ import Moment from "react-moment";
 import ReactPaginate from "react-paginate";
 import styles from "../datatable_movies/datatable_movie.module.css";
 import {getAllNotifications} from "../../../services/notification";
-import {CircularProgress} from "@mui/material";
+import {CircularProgress, IconButton} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 
-const DataTableNotification = ({type, title, className = ''}) => {
+const DataTableNotification = ({
+                                   type,
+                                   title,
+                                   className = '',
+                                   onDelete = () => {
+                                   },
+                                   onEdit = () => {
+                                   }
+                               }) => {
     // state
     const [notifications, setNotifications] = React.useState([])
 
@@ -73,6 +83,8 @@ const DataTableNotification = ({type, title, className = ''}) => {
                             <TableCell>
                                 Ngày tạo
                             </TableCell>
+                            <TableCell>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -104,7 +116,19 @@ const DataTableNotification = ({type, title, className = ''}) => {
                                             {noti.createdAt}
                                         </Moment>
                                     </TableCell>
-                                    <TableCell></TableCell>
+                                    <TableCell align='right'>
+                                        <div className='d-flex gap-1 justify-content-end'>
+                                            <IconButton aria-label="delete" title='Xóa thông báo'
+                                                        onClick={() => onDelete(noti)}
+                                            >
+                                                <DeleteIcon className='text-danger'/>
+                                            </IconButton>
+                                            <IconButton aria-label="edit" title='Cập nhật thông báo'
+                                                        onClick={() => onEdit(noti)}>
+                                                <EditIcon className='text-info'/>
+                                            </IconButton>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>)
                         }
                     </TableBody>
