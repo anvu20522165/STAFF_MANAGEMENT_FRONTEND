@@ -1,20 +1,21 @@
 import './single.scss';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
-import Chart from '../../components/chart/Chart';
-import List from '../../components/table/Table';
-import { jwtDecode } from 'jwt-decode';
-import { useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
+import {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import DataTableNotification from "../../components/datatable/datatable_notifications/DataTableNotification";
+import {getNotificationsByUserId} from "../../services/notification";
+
 const Single = (item) => {
-    const { userId } = useParams(); //lấy id từ url
+    const {userId} = useParams(); //lấy id từ url
     const [username, setUsername] = useState('');
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
@@ -30,23 +31,23 @@ const Single = (item) => {
     const [token, setToken] = useState('');
 
     const genders = [
-        { value: 'MALE', label: 'Nam' },
-        { value: 'FEMALE', label: 'Nữ' },
+        {value: 'MALE', label: 'Nam'},
+        {value: 'FEMALE', label: 'Nữ'},
     ];
 
     const positions = [
-        { value: 'TRUONG_PHONG', label: 'Trưởng phòng' },
-        { value: 'NHAN_VIEN', label: 'Nhân viên' },
+        {value: 'TRUONG_PHONG', label: 'Trưởng phòng'},
+        {value: 'NHAN_VIEN', label: 'Nhân viên'},
     ];
 
     const departments = [
-        { value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc' },
-        { value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự' },
-        { value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính' },
-        { value: 'PHONG_MARKETING', label: 'Phòng Marketing' },
-        { value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật' },
-        { value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất' },
-        { value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính' },
+        {value: 'BAN_GIAM_DOC', label: 'Ban Giám Đốc'},
+        {value: 'PHONG_NHAN_SU', label: 'Phòng Nhân Sự'},
+        {value: 'PHONG_TAI_CHINH', label: 'Phòng Tài Chính'},
+        {value: 'PHONG_MARKETING', label: 'Phòng Marketing'},
+        {value: 'PHONG_KY_THUAT', label: 'Phòng Kỹ Thuật'},
+        {value: 'PHONG_SAN_XUAT', label: 'Phòng Sản Xuất'},
+        {value: 'PHONG_HANH_CHINH', label: 'Phòng Hành Chính'},
     ];
 
     const fetchDetail = async () => {
@@ -95,6 +96,7 @@ const Single = (item) => {
                 console.log('lỗi cmnr');
             }
         }
+
         checkAuth();
         fetchDetail();
     }, []);
@@ -114,7 +116,7 @@ const Single = (item) => {
         };
         axios
             .put(`http://localhost:5555/v1/user/${userId}`, updatedUser, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
                 window.location.replace(`/users/${userId}`);
@@ -139,9 +141,9 @@ const Single = (item) => {
 
     return (
         <div className="single">
-            <Sidebar />
+            <Sidebar/>
             <div className="singleContainer">
-                <Navbar />
+                <Navbar/>
                 <div className="top">
                     <div className="left">
                         <Button className="editButton" onClick={() => updatePassword(userId, token)}>
@@ -149,7 +151,7 @@ const Single = (item) => {
                         </Button>
                         <h1 className="title">Thông Tin Cá Nhân</h1>
                         <div className="item">
-                            <img src={avt} alt="" className="itemImg" />
+                            <img src={avt} alt="" className="itemImg"/>
                             <div className="details">
                                 <div className="detailItem">
                                     <div className="itemKey">Username:</div>
@@ -262,7 +264,7 @@ const Single = (item) => {
                                     <div className="itemKey">Giới tính:</div>
                                     <div className="itemValue">
                                         {gender && (
-                                            <Select defaultValue={gender} onChange={setGender} options={genders} />
+                                            <Select defaultValue={gender} onChange={setGender} options={genders}/>
                                         )}
                                     </div>
                                 </div>
@@ -328,7 +330,7 @@ const Single = (item) => {
                                 {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
                                     <Button
                                         onClick={() => updateUser(userId, token)}
-                                        style={{ borderRadius: 5, background: 'green' }}
+                                        style={{borderRadius: 5, background: 'green'}}
                                     >
                                         {' '}
                                         Cập nhật{' '}
@@ -340,7 +342,12 @@ const Single = (item) => {
                         </div>
                     </div>
                     <div className="right">
-                        <h1 className="title">Thông Báo Cá Nhân</h1>
+                        <DataTableNotification
+                            hideActions
+                            title='Thông báo cá nhân'
+                            apiFunc={getNotificationsByUserId}
+                            apiParam={userId}
+                        />
                     </div>
                 </div>
             </div>

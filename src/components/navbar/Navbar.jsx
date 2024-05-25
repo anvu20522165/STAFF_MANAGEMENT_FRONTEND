@@ -34,8 +34,8 @@ const Navbar = () => {
         checkAuth();
     }, []);
     return (
-        <div className="navbar">
-            <div className="wrapper">
+        <div className="navbar p-0 mb-3">
+            <div className="wrapper p-0">
                 {/* <div className="search"> */}
                 <div>
                     {/* <input type="text" placeholder="Tìm kiếm..." />
