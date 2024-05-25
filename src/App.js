@@ -1,10 +1,10 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import Single from './pages/single/Single';
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './style/dark.scss';
-import {DarkModeContext} from './context/darkModeContext';
+import { DarkModeContext } from './context/darkModeContext';
 import List_user from './pages/list/list_users/List_user';
 import List_order from './pages/order/List_order';
 import Announcement from './pages/announcement/Announcement';
@@ -18,8 +18,10 @@ import List_request from './pages/list/list_request/List_request';
 import List_multiTask from './pages/list/list_multiTask/List_multiTask';
 import SingleMultiTask from './pages/multitask/View/Single';
 import Profile from './pages/Profile/Profile';
-import Notification from "./pages/notification/Notification";
+import Notification from './pages/notification/Notification';
 import 'bootstrap/dist/css/bootstrap.css';
+import Structure from './pages/structure/Structure';
+import Contact from './pages/contact/Contact';
 
 function App() {
     const { darkMode } = useContext(DarkModeContext);
@@ -32,6 +34,13 @@ function App() {
 
                         <Route path="notice">
                             <Route index element={<Notification />} />
+                        </Route>
+
+                        <Route path="structure">
+                            <Route index element={<Structure />} />
+                        </Route>
+                        <Route path="contact">
+                            <Route index element={<Contact />} />
                         </Route>
 
                         <Route path="announcement">
