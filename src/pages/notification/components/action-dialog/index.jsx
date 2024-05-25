@@ -157,7 +157,15 @@ const ActionDialog =
 
             }
 
-        }, [validateForm, usersSelected, notification, selectedType])
+        }, [
+            validateForm,
+            usersSelected,
+            notification,
+            selectedType,
+            onUpdateSuccess,
+            onCreateSuccess,
+            onError,
+        ])
 
         /**
          * ref handler

@@ -34,7 +34,7 @@ const ConfirmDeleteDialog =
                     setIsDeleting(false)
                 })
             }
-        }, [notification])
+        }, [notification, onError, onDeleteSuccess])
 
         /**
          * ref handler

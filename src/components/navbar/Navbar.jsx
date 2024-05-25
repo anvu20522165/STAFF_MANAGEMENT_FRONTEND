@@ -35,7 +35,7 @@ const Navbar = () => {
     }, []);
     return (
         <div className="navbar p-0 mb-3">
-            <div className="wrapper">
+            <div className="wrapper p-0">
                 {/* <div className="search"> */}
                 <div>
                     {/* <input type="text" placeholder="Tìm kiếm..." />

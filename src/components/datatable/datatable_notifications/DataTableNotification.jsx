@@ -23,7 +23,9 @@ const DataTableNotification =
                           onDelete = () => {
                           },
                           onEdit = () => {
-                          }
+                          },
+                          apiFunc = getAllNotifications,
+                          hideActions = false,
                       }, ref) => {
         // state
         const [notifications, setNotifications] = React.useState([])
@@ -32,7 +34,7 @@ const DataTableNotification =
         const [isLoadingFetchNotification, setIsLoadingFetchNotification] = React.useState(true)
 
         // paging
-        const [svtPerPage, setSvtPerPage] = useState(7)
+        const [svtPerPage] = useState(7)
         const [CsvtPerPage, setCSvtPerPage] = useState(1)
         const numOfToTalPages = Math.ceil(notifications.length / svtPerPage);
         const indexOfLastSVT = CsvtPerPage * svtPerPage;
@@ -56,7 +58,7 @@ const DataTableNotification =
             setCSvtPerPage(1)
             setNotifications([])
             setIsLoadingFetchNotification(true)
-            getAllNotifications(type).then(({data}) => {
+            apiFunc(type).then(({data}) => {
                 setNotifications(data || [])
             }).finally(() => {
                 setIsLoadingFetchNotification(false)
@@ -103,7 +105,8 @@ const DataTableNotification =
 
                         <TableBody>
                             {isLoadingFetchNotification && <TableRow>
-                                <TableCell colSpan={4} className='text-center my-3 py-3 text-secondary h-25 w-100'>
+                                <TableCell colSpan={!!hideActions ? 3 : 4}
+                                           className='text-center my-3 py-3 text-secondary h-25 w-100'>
                                     <div className='w-100 d-flex justify-content-center align-items-center'
                                          style={{minHeight: '100px'}}>
                                         <CircularProgress/>
@@ -111,7 +114,8 @@ const DataTableNotification =
                                 </TableCell>
                             </TableRow>}
                             {(!visibleSVT.length && !isLoadingFetchNotification) && <TableRow>
-                                <TableCell colSpan={4} className='text-center my-3 py-3 text-secondary'>
+                                <TableCell colSpan={!!hideActions ? 3 : 4}
+                                           className='text-center my-3 py-3 text-secondary'>
                                     <p className='text-center my-3 text-secondary'>Không có dữ liệu</p>
                                 </TableCell>
                             </TableRow>}
@@ -129,19 +133,21 @@ const DataTableNotification =
                                                 {noti.createdAt}
                                             </Moment>
                                         </TableCell>
-                                        <TableCell align='right'>
-                                            <div className='d-flex gap-1 justify-content-end'>
-                                                <IconButton aria-label="edit" title='Cập nhật thông báo'
-                                                            onClick={() => onEdit(noti)}>
-                                                    <EditIcon className='text-info'/>
-                                                </IconButton>
-                                                <IconButton aria-label="delete" title='Xóa thông báo'
-                                                            onClick={() => onDelete(noti)}
-                                                >
-                                                    <DeleteIcon className='text-danger'/>
-                                                </IconButton>
-                                            </div>
-                                        </TableCell>
+                                        {
+                                            !hideActions && <TableCell align='right'>
+                                                <div className='d-flex gap-1 justify-content-end'>
+                                                    <IconButton aria-label="edit" title='Cập nhật thông báo'
+                                                                onClick={() => onEdit(noti)}>
+                                                        <EditIcon className='text-info'/>
+                                                    </IconButton>
+                                                    <IconButton aria-label="delete" title='Xóa thông báo'
+                                                                onClick={() => onDelete(noti)}
+                                                    >
+                                                        <DeleteIcon className='text-danger'/>
+                                                    </IconButton>
+                                                </div>
+                                            </TableCell>
+                                        }
                                     </TableRow>)
                             }
                         </TableBody>

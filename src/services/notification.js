@@ -45,3 +45,13 @@ export const updateNotification = (id, payload) => {
 export const deleteNotification = (id) => {
     return axiosInstance.delete(`/notification/${id}`)
 }
+
+/**
+ * get notification by user
+ *
+ * @param userId
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const getNotificationsByUserId = (userId) => {
+    return axiosInstance.get(`/notification/user/${userId}`)
+}

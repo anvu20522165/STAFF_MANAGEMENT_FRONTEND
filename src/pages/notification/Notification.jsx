@@ -7,9 +7,15 @@ import DataTableNotification from "../../components/datatable/datatable_notifica
 import {NotificationType} from "../../constants/notification";
 import ActionDialog from "./components/action-dialog";
 import ConfirmDeleteDialog from "./components/confirm-delete-dialog";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from "jwt-decode";
 
+const actionAbleRoles = ["TRUONG_PHONG", "CEO"]
 
 const Notification = () => {
+    // state user access
+    const [userAccess, setUserAccess] = React.useState(null)
+
     // states
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -19,6 +25,13 @@ const Notification = () => {
         setSnackbarSeverity(severity);
         setOpenSnackbar(true);
     };
+
+    // memo
+    const actionAble = React.useMemo(() => {
+        return actionAbleRoles
+            .map(o => o.toLowerCase())
+            .includes((userAccess?.position || '').toLowerCase())
+    }, [userAccess?.position])
 
     // ref
     const deleteConfirmRef = React.useRef({
@@ -61,9 +74,9 @@ const Notification = () => {
      *
      * @type {(function())|*}
      */
-    const handleActionSuccess = React.useCallback(({type}, title) => {
+    const handleActionSuccess = React.useCallback((val, title) => {
         handleSnackbarOpen(title || 'Successfully', 'success')
-        switch (type) {
+        switch (val.type) {
             case NotificationType.Notify:
                 tableNotifyRef.current?.reload()
                 break
@@ -88,10 +101,26 @@ const Notification = () => {
     }, [])
 
     /**
+     * get current position
+     *
+     * @type {(function(): void)|*}
+     */
+    const getCurrentPosition = React.useCallback(async () => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            const decodedToken = jwtDecode(accessToken);
+            setUserAccess(decodedToken)
+        } catch (e) {
+            console.error(e)
+        }
+    }, [])
+
+    /**
      * initial
      */
     React.useEffect(() => {
-    }, [])
+        getCurrentPosition()
+    }, [getCurrentPosition])
 
     return (
         <div className="home">
@@ -109,6 +138,7 @@ const Notification = () => {
                     <div className='d-flex justify-content-between gap-3 mb-3 pb-3 border-bottom'>
                         <b className='text-secondary fs-3'>Quản lý thông báo</b>
                         <Button
+                            disabled={!actionAble}
                             style={{borderRadius: 5, background: 'rgb(98, 192, 216)'}}
                             variant="contained"
                             onClick={() => actionDialogRef.current?.open()}
@@ -120,6 +150,7 @@ const Notification = () => {
                     {/*region tables*/}
                     <div>
                         <DataTableNotification ref={tableInternalRef} className='mb-3'
+                                               hideActions={!actionAble}
                                                type={NotificationType.Internal}
                                                title='Thông tin nội bộ'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
@@ -127,12 +158,14 @@ const Notification = () => {
                         />
 
                         <DataTableNotification ref={tableNotifyRef} className='mb-3'
+                                               hideActions={!actionAble}
                                                type={NotificationType.Notify}
                                                title='Thông báo'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
                                                onDelete={(val) => deleteConfirmRef.current?.open(val)}/>
 
                         <DataTableNotification ref={tableFelicitationRef} className='mb-3'
+                                               hideActions={!actionAble}
                                                type={NotificationType.Felicitation}
                                                title='Khen thưởng'
                                                onEdit={(val) => actionDialogRef.current?.open(val)}
