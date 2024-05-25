@@ -78,6 +78,20 @@ const Sidebar = () => {
                             <span>Công việc liên đơn vị</span>
                         </Link>
                     </li>
+
+                    <li>
+                        <Link to="/structure" style={{ textDecoration: 'none' }}>
+                            <DescriptionIcon className="icon" />
+                            <span>Cơ cấu</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/contact" style={{ textDecoration: 'none' }}>
+                            <DescriptionIcon className="icon" />
+                            <span>Liên hệ</span>
+                        </Link>
+                    </li>
+
                     <p className="title">Danh Sách</p>
                     <Link to="/users" style={{ textDecoration: 'none' }}>
                         <li>

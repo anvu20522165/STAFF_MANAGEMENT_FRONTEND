@@ -1,10 +1,8 @@
 import './single.scss';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
-import Chart from '../../components/chart/Chart';
-import List from '../../components/table/Table';
 import { jwtDecode } from 'jwt-decode';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,6 +11,9 @@ import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import DataTableNotification from '../../components/datatable/datatable_notifications/DataTableNotification';
+import { getNotificationsByUserId } from '../../services/notification';
+
 const Single = (item) => {
     const { userId } = useParams(); //lấy id từ url
     const [username, setUsername] = useState('');
@@ -95,6 +96,7 @@ const Single = (item) => {
                 console.log('lỗi cmnr');
             }
         }
+
         checkAuth();
         fetchDetail();
     }, []);
@@ -340,8 +342,12 @@ const Single = (item) => {
                         </div>
                     </div>
                     <div className="right">
-                        <h1 className="title">Doanh thu: </h1>
-                        <Chart title="Biến động doanh thu" aspect={2 / 1} />
+                        <DataTableNotification
+                            hideActions
+                            title="Thông báo cá nhân"
+                            apiFunc={getNotificationsByUserId}
+                            apiParam={userId}
+                        />
                     </div>
                 </div>
             </div>
