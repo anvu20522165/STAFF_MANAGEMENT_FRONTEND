@@ -34,7 +34,7 @@ const Navbar = () => {
         checkAuth();
     }, []);
     return (
-        <div className="navbar">
+        <div className="navbar p-0 mb-3">
             <div className="wrapper">
                 {/* <div className="search"> */}
                 <div>

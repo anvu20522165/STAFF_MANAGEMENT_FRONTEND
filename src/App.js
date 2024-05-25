@@ -21,6 +21,7 @@ import SingleMultiTask from './pages/multitask/View/Single';
 import Profile from './pages/Profile/Profile';
 import Notice from './pages/notice/Notice';
 import Notification from "./pages/notification/Notification";
+import 'bootstrap/dist/css/bootstrap.css';
 
 function App() {
     const { darkMode } = useContext(DarkModeContext);
