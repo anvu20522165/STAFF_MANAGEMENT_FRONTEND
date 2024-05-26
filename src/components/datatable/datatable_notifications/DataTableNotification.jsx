@@ -13,6 +13,7 @@ import {getAllNotifications} from "../../../services/notification";
 import {CircularProgress, IconButton} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import {NotificationStatus} from "../../../constants/notification";
 
 
 const DataTableNotification =
@@ -121,9 +122,16 @@ const DataTableNotification =
                             </TableRow>}
                             {
                                 visibleSVT.map((noti, idx) =>
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} className='bg-opacity-10'>
                                         <TableCell>
-                                            {noti.title}
+                                            <div className='d-flex flex-wrap gap-1'>
+                                                <div>{noti.title}</div>
+                                                {noti.status === NotificationStatus.Unread &&
+                                                    <span
+                                                        className="badge rounded-pill bg-primary">Thông báo mới
+                                                    </span>}
+                                            </div>
+
                                         </TableCell>
                                         <TableCell>
                                             {noti.message}
