@@ -1,19 +1,27 @@
-import styles from './Profile.scss';
+import React, {useEffect, useState} from 'react'
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 
-import { jwtDecode } from 'jwt-decode';
-import { useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
+import {getNotificationsByUserId, markNotificationRead} from "../../services/notification";
+import DataTableNotification from "../../components/datatable/datatable_notifications/DataTableNotification";
+import {useDispatch} from "react-redux";
+import {NotificationActionsThunk} from "../../redux-store/reducers/notification";
+
 const Profile = (item) => {
-    const { userId } = useParams(); //lấy id từ url
+    // redux store
+    const dispatchRedux = useDispatch();
+
+    // state init
+    const {userId} = useParams(); //lấy id từ url
     const [username, setUsername] = useState('');
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
@@ -112,7 +120,7 @@ const Profile = (item) => {
         };
         axios
             .put(`http://localhost:5555/v1/user/${userId}`, updatedUser, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
                 window.location.replace(`/users/profile/${userId}`);
@@ -135,11 +143,32 @@ const Profile = (item) => {
         }
     }
 
+    /**
+     * mark notification
+     *
+     * @type {(function())|*}
+     */
+    const markNotify = React.useCallback(async () => {
+        const accessToken = await AsyncStorage.getItem('accessToken')
+        const decodedToken = jwtDecode(accessToken);
+        markNotificationRead(decodedToken.id).then(() => {
+        }).finally(() => {
+            dispatchRedux(NotificationActionsThunk.fetchNoReadCountThunk())
+        })
+    }, [])
+
+    /**
+     * user effect o mark notify
+     */
+    React.useEffect(() => {
+        markNotify()
+    }, [markNotify])
+
     return (
         <div className="single">
-            <Sidebar />
+            <Sidebar/>
             <div className="singleContainer">
-                <Navbar />
+                <Navbar/>
                 <div className="top">
                     <div className="left">
                         <Button className="editButton" onClick={() => updatePassword(userId, token)}>
@@ -147,7 +176,7 @@ const Profile = (item) => {
                         </Button>
                         <h1 className="title">Thông Tin Cá Nhân</h1>
                         <div className="item">
-                            <img src={avt} alt="" className="itemImg" />
+                            <img src={avt} alt="" className="itemImg"/>
                             <div className="details">
                                 <div className="detailItem">
                                     <div className="itemKey">Username:</div>
@@ -263,7 +292,7 @@ const Profile = (item) => {
                                     <div className="itemKey">Giới tính:</div>
                                     <div className="itemValue">
                                         {gender && (
-                                            <Select defaultValue={gender} onChange={setGender} options={genders} />
+                                            <Select defaultValue={gender} onChange={setGender} options={genders}/>
                                         )}
                                     </div>
                                 </div>
@@ -287,14 +316,14 @@ const Profile = (item) => {
                                     <div className="itemKey">Phòng ban:</div>
                                     <div className="itemValue">
                                         {department && (
-                                            <Select defaultValue={department} onChange={setDepartment} disabled />
+                                            <Select defaultValue={department} onChange={setDepartment} disabled/>
                                         )}
                                     </div>
                                 </div>
                                 <div className="detailItem">
                                     <div className="itemKey">Chức vụ:</div>
                                     <div className="itemValue">
-                                        {position && <Select defaultValue={position} onChange={setPosition} disabled />}
+                                        {position && <Select defaultValue={position} onChange={setPosition} disabled/>}
                                     </div>
                                 </div>
                                 <div className="detailItem">
@@ -320,7 +349,7 @@ const Profile = (item) => {
                                 {userId == userIdCheck ? (
                                     <Button
                                         onClick={() => updateUser(userId, token)}
-                                        style={{ borderRadius: 5, background: 'green' }}
+                                        style={{borderRadius: 5, background: 'green'}}
                                     >
                                         {' '}
                                         Cập nhật{' '}
@@ -331,6 +360,15 @@ const Profile = (item) => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div className='m-3'>
+                    <DataTableNotification
+                        hideActions
+                        title="Thông báo cá nhân"
+                        apiFunc={getNotificationsByUserId}
+                        apiParam={userId}
+                    />
                 </div>
             </div>
         </div>

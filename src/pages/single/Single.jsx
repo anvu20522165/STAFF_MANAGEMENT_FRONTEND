@@ -1,21 +1,19 @@
 import './single.scss';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
-import { jwtDecode } from 'jwt-decode';
-import { useEffect, useState } from 'react';
+import {jwtDecode} from 'jwt-decode';
+import {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
-import DataTableNotification from '../../components/datatable/datatable_notifications/DataTableNotification';
-import { getNotificationsByUserId } from '../../services/notification';
 
 const Single = (item) => {
-    const { userId } = useParams(); //lấy id từ url
+    const {userId} = useParams(); //lấy id từ url
     const [username, setUsername] = useState('');
     const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
@@ -116,7 +114,7 @@ const Single = (item) => {
         };
         axios
             .put(`http://localhost:5555/v1/user/${userId}`, updatedUser, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {Authorization: `Bearer ${token}`},
             })
             .then((response) => {
                 window.location.replace(`/users/${userId}`);
@@ -141,9 +139,9 @@ const Single = (item) => {
 
     return (
         <div className="single">
-            <Sidebar />
+            <Sidebar/>
             <div className="singleContainer">
-                <Navbar />
+                <Navbar/>
                 <div className="top">
                     <div className="left">
                         <Button className="editButton" onClick={() => updatePassword(userId, token)}>
@@ -151,7 +149,7 @@ const Single = (item) => {
                         </Button>
                         <h1 className="title">Thông Tin Cá Nhân</h1>
                         <div className="item">
-                            <img src={avt} alt="" className="itemImg" />
+                            <img src={avt} alt="" className="itemImg"/>
                             <div className="details">
                                 <div className="detailItem">
                                     <div className="itemKey">Username:</div>
@@ -264,7 +262,7 @@ const Single = (item) => {
                                     <div className="itemKey">Giới tính:</div>
                                     <div className="itemValue">
                                         {gender && (
-                                            <Select defaultValue={gender} onChange={setGender} options={genders} />
+                                            <Select defaultValue={gender} onChange={setGender} options={genders}/>
                                         )}
                                     </div>
                                 </div>
@@ -330,7 +328,7 @@ const Single = (item) => {
                                 {departmentHead == 'TRUONG_PHONG' && departmentHR == 'PHONG_NHAN_SU' ? (
                                     <Button
                                         onClick={() => updateUser(userId, token)}
-                                        style={{ borderRadius: 5, background: 'green' }}
+                                        style={{borderRadius: 5, background: 'green'}}
                                     >
                                         {' '}
                                         Cập nhật{' '}
@@ -342,12 +340,6 @@ const Single = (item) => {
                         </div>
                     </div>
                     <div className="right">
-                        <DataTableNotification
-                            hideActions
-                            title="Thông báo cá nhân"
-                            apiFunc={getNotificationsByUserId}
-                            apiParam={userId}
-                        />
                     </div>
                 </div>
             </div>
