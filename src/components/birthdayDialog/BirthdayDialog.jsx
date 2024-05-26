@@ -2,8 +2,7 @@ import React from 'react'
 import {Dialog, DialogContent} from "@mui/material";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {jwtDecode} from "jwt-decode";
-
-const BIRTHDAY_STORAGE_KEY = 'BIRTHDAY_STORAGE_KEY';
+import {LocalstorageKey} from "../../constants/localstorage";
 
 const BirthdayDialog =
     React.forwardRef(({...props}, ref) => {
@@ -31,12 +30,12 @@ const BirthdayDialog =
                     === new Date().toISOString().slice(5, 10)
                 let hasShown = false
                 try {
-                    hasShown = JSON.parse(localStorage.getItem(BIRTHDAY_STORAGE_KEY))[user.iat]
+                    hasShown = JSON.parse(localStorage.getItem(LocalstorageKey.birthdayNotify))[user.iat]
                 } catch {
                 }
                 if (isBirthday && !hasShown) {
                     setOpen(true)
-                    localStorage.setItem(BIRTHDAY_STORAGE_KEY, JSON.stringify({
+                    localStorage.setItem(LocalstorageKey.birthdayNotify, JSON.stringify({
                         [user.iat]: true
                     }))
                 }
@@ -67,7 +66,7 @@ const BirthdayDialog =
                 if (user) {
                     setUser(user)
                     setOpen(true)
-                    localStorage.setItem(BIRTHDAY_STORAGE_KEY, JSON.stringify({
+                    localStorage.setItem(LocalstorageKey.birthdayNotify, JSON.stringify({
                         [user.id]: true
                     }))
                 }
