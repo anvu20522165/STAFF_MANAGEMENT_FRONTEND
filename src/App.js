@@ -22,8 +22,10 @@ import Notification from './pages/notification/Notification';
 import 'bootstrap/dist/css/bootstrap.css';
 import Structure from './pages/structure/Structure';
 import Contact from './pages/contact/Contact';
+import BirthdayDialog from "./components/birthdayDialog/BirthdayDialog";
 
 function App() {
+
     const { darkMode } = useContext(DarkModeContext);
     return (
         <div className={darkMode ? 'app dark' : 'app'}>
@@ -85,6 +87,10 @@ function App() {
                     </Route>
                 </Routes>
             </BrowserRouter>
+
+            {/*region birthday dialog*/}
+            <BirthdayDialog/>
+            {/*endregion birthday dialog*/}
         </div>
     );
 }
