@@ -3,15 +3,13 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import FeedbackIcon from '@mui/icons-material/Feedback';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import HardwareIcon from '@mui/icons-material/Hardware';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { Link } from 'react-router-dom';
 import { DarkModeContext } from '../../context/darkModeContext';
 import { useContext } from 'react';
-import HomeIcon from '@mui/icons-material/Home';
 const Sidebar = () => {
     const { dispatch } = useContext(DarkModeContext);
 
@@ -19,7 +17,6 @@ const Sidebar = () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         console.log(accessToken);
         const data = 'logout';
-        // code to logout the user and clear user data from state
         axios
             .post('http://localhost:5555/v1/auth/logout', data, { headers: { Authorization: `Bearer ${accessToken}` } })
             .then((response) => {
@@ -64,6 +61,12 @@ const Sidebar = () => {
                         <Link to="/document" style={{ textDecoration: 'none' }}>
                             <DescriptionIcon className="icon" />
                             <span>Tài liệu</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/hardware" style={{ textDecoration: 'none' }}>
+                            <HardwareIcon className="icon" />
+                            <span>Tài nguyên phần cứng</span>
                         </Link>
                     </li>
                     <li>
