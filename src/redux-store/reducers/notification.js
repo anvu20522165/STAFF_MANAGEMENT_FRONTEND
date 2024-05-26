@@ -17,7 +17,7 @@ const fetchNoReadCountThunk = createAsyncThunk(
                 return 0
             }
         } catch (e) {
-            console.error('fetchNoReadCountThunk: ', e)
+            console.error('Has error with fetchNoReadCountThunk: ', e)
             return 0
         }
     }
