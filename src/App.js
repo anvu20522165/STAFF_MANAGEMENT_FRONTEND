@@ -22,7 +22,10 @@ import Notification from './pages/notification/Notification';
 import 'bootstrap/dist/css/bootstrap.css';
 import Structure from './pages/structure/Structure';
 import Contact from './pages/contact/Contact';
+
 import BirthdayDialog from "./components/birthdayDialog/BirthdayDialog";
+
+import Hardware from './pages/hardware/Hardware';
 
 function App() {
     // context
@@ -51,6 +54,9 @@ function App() {
                         </Route>
                         <Route path="document">
                             <Route index element={<Document/>}/>
+                        </Route>
+                        <Route path="hardware">
+                            <Route index element={<Hardware />} />
                         </Route>
 
                         <Route path="users">
