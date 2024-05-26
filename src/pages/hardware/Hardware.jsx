@@ -20,14 +20,14 @@ import ReactPaginate from 'react-paginate';
 import Sidebar from '../../components/sidebar/Sidebar';
 import Navbar from '../../components/navbar/Navbar';
 import CustomSnackbar from '../../components/customSnackbar/CustomSnackbar';
-import './Document.scss';
+import './Hardware.scss';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
-const Document = () => {
+const Hardware = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -38,23 +38,23 @@ const Document = () => {
     const [userPosition, setUserPosition] = useState('');
     const [userDepartment, setUserDepartment] = useState('');
     const [open, setOpen] = useState(false);
-    const [editDocument, setEditDocument] = useState(null);
+    const [editHardware, setEditHardware] = useState(null);
     const [actionType, setActionType] = useState('add');
-    let [visibleDocuments, setVisibleDocument] = useState([]);
+    let [visibleHardwares, setVisibleHardwares] = useState([]);
     const [isViewMode, setIsViewMode] = useState(false);
 
     const location = useLocation();
     const params = queryString.parse(location.search);
-    const [nameDocument, setNameDocument] = useState(() => {
-        return params.nameDocument;
+    const [deviceName, setDeviceName] = useState(() => {
+        return params.deviceName;
     });
-    const [Source, setSource] = useState(() => {
-        return params.Source;
+    const [description, setDescription] = useState(() => {
+        return params.description;
     });
 
-    const indexOfLastDocument = currentPage * perPage;
-    const indexOfFirstDocument = indexOfLastDocument - perPage;
-    visibleDocuments = tableData?.slice(indexOfFirstDocument, indexOfLastDocument);
+    const indexOfLastHardware = currentPage * perPage;
+    const indexOfFirstHardware = indexOfLastHardware - perPage;
+    visibleHardwares = tableData?.slice(indexOfFirstHardware, indexOfLastHardware);
 
     const handleSnackbarOpen = (message, severity) => {
         setSnackbarMessage(message);
@@ -71,31 +71,29 @@ const Document = () => {
 
     function buildSearchURL() {
         const searchData = {
-            nameDocument: nameDocument || '',
-            Source: Source || '',
+            deviceName: deviceName || '',
+            description: description || '',
         };
-        let url = `http://localhost:5555/v1/document/get-all-documents?`;
+        let url = `http://localhost:5555/v1/hardware/get-all-hardware?`;
 
-        // Check nameAnnouncement
-        if (searchData.nameDocument !== undefined && searchData.nameDocument !== 'undefined') {
-            url = url + `nameDocument=${searchData.nameDocument}`;
+        if (searchData.deviceName !== undefined && searchData.deviceName !== 'undefined') {
+            url = url + `deviceName=${searchData.deviceName}`;
         } else {
-            url = url + `nameDocument=`;
-            setNameDocument('');
+            url = url + `deviceName=`;
+            setDeviceName('');
         }
 
-        // Check meeting
-        if (searchData.Source !== undefined && searchData.Source !== 'undefined') {
-            url = url + `&Source=${searchData.Source}`;
+        if (searchData.description !== undefined && searchData.description !== 'undefined') {
+            url = url + `&description=${searchData.description}`;
         } else {
-            url = url + `&Source=`;
-            setSource('');
+            url = url + `&description=`;
+            setDescription('');
         }
 
         return url;
     }
 
-    const loadDocumnet = async () => {
+    const loadHardware = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
 
@@ -114,7 +112,7 @@ const Document = () => {
     };
 
     function search() {
-        window.location.replace(`/document?nameDocument=${nameDocument}&Source=${Source}`);
+        window.location.replace(`/hardware?deviceName=${deviceName}&description=${description}`);
     }
 
     const getUserInfo = async () => {
@@ -129,40 +127,43 @@ const Document = () => {
     };
 
     useEffect(() => {
-        loadDocumnet();
+        loadHardware();
         getUserInfo();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const [formData, setFormData] = useState({
-        nameDocument: '',
-        Source: '',
-        NumberOfDocument: '',
+        deviceName: '',
+        description: '',
+        NumberOfDevice: '',
+        mainowner: '',
     });
 
-    const handleClickOpen = (type, document = null) => {
-        if (type === 'edit' && document) {
+    const handleClickOpen = (type, hardware = null) => {
+        if (type === 'edit' && hardware) {
             setFormData({
-                nameDocument: document.nameDocument || '',
-                Source: document.Source || '',
-                NumberOfDocument: document.NumberOfDocument || '',
+                deviceName: hardware.deviceName || '',
+                description: hardware.description || '',
+                NumberOfDevice: hardware.NumberOfDevice || '',
+                mainowner: hardware.mainowner || '',
             });
-            setEditDocument(document);
+            setEditHardware(hardware);
             setActionType('edit');
-        } else if (type === 'view' && document) {
+        } else if (type === 'view' && hardware) {
             setFormData({
-                nameDocument: document.nameDocument || '',
-                Source: document.Source || '',
-                NumberOfDocument: document.NumberOfDocument || '',
+                deviceName: hardware.deviceName || '',
+                description: hardware.description || '',
+                NumberOfDevice: hardware.NumberOfDevice || '',
+                mainowner: hardware.mainowner || '',
             });
-            setEditDocument(null);
+            setEditHardware(null);
             setActionType('view');
             setIsViewMode(true);
         } else {
             setFormData({
-                nameDocument: '',
-                Source: '',
-                NumberOfDocument: '',
+                deviceName: '',
+                description: '',
+                NumberOfDevice: '',
+                mainowner: '',
             });
             setActionType('add');
         }
@@ -179,22 +180,20 @@ const Document = () => {
 
     const handleDelete = async (id) => {
         try {
-            const accessToken = await AsyncStorage.getItem('accessToken'); // Hoặc cách lấy token của bạn
-            const response = await axios.delete(`http://localhost:5555/v1/document/delete-document/${id}`, {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            const response = await axios.delete(`http://localhost:5555/v1/hardware/delete-hardware/${id}`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
 
             if (response.status === 200) {
-                setVisibleDocument((prevAnnouncements) =>
-                    prevAnnouncements.filter((announcement) => announcement._id !== id),
-                );
-                handleSnackbarOpen('Xóa tài liệu thành công!', 'success');
+                setVisibleHardwares((prevHardwares) => prevHardwares.filter((hardware) => hardware._id !== id));
+                handleSnackbarOpen('Xóa phần cứng thành công!', 'success');
             }
-            loadDocumnet();
+            loadHardware();
         } catch (error) {
-            handleSnackbarOpen('Đã có lỗi xảy ra khi xóa tài liệu. Vui lòng thử lại sau.', 'error');
+            handleSnackbarOpen('Đã có lỗi xảy ra khi xóa phần cứng. Vui lòng thử lại sau.', 'error');
         }
     };
 
@@ -204,7 +203,7 @@ const Document = () => {
 
     const handleClose = () => {
         setOpen(false);
-        setEditDocument(null);
+        setEditHardware(null);
         setActionType('add');
     };
 
@@ -213,20 +212,20 @@ const Document = () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
             if (actionType === 'add') {
-                await axios.post('http://localhost:5555/v1/document/add-document', formData, {
+                await axios.post('http://localhost:5555/v1/hardware/add-hardware', formData, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
             } else if (actionType === 'edit') {
-                await axios.put(`http://localhost:5555/v1/document/update-document/${editDocument._id}`, formData, {
+                await axios.put(`http://localhost:5555/v1/hardware/update-hardware/${editHardware._id}`, formData, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
             }
-            handleClose(); // Đóng dialog sau khi thêm mới hoặc cập nhật thành công
-            loadDocumnet();
+            handleClose();
+            loadHardware();
             handleSnackbarOpen(actionType === 'add' ? 'Thêm mới thành công!' : 'Cập nhật thành công!', 'success');
         } catch (error) {
             console.log(error.response.data);
@@ -248,8 +247,8 @@ const Document = () => {
                 <div className={styles.servicePage}>
                     <div className={styles.datatable}>
                         <div className={styles.datatableTitle}>
-                            <b>Quản lý tài liệu</b>
-                            {userPosition === 'TRUONG_PHONG' && userDepartment === 'PHONG_NHAN_SU' && (
+                            <b>Quản lý phần cứng</b>
+                            {userPosition === 'TRUONG_PHONG' && userDepartment === 'PHONG_KY_THUAT' && (
                                 <Button
                                     style={{ borderRadius: 5, background: 'rgb(98, 192, 216)' }}
                                     variant="contained"
@@ -263,19 +262,19 @@ const Document = () => {
                         <Dialog open={open} onClose={handleClose}>
                             <DialogTitle>
                                 {actionType === 'add'
-                                    ? 'Thêm mới tài liệu'
+                                    ? 'Thêm mới phần cứng'
                                     : actionType === 'view'
-                                    ? 'Xem chi tiết tài liệu'
-                                    : 'Chỉnh sửa tài liệu'}
+                                    ? 'Xem chi tiết phần cứng'
+                                    : 'Chỉnh sửa phần cứng'}
                             </DialogTitle>
                             <DialogContent>
                                 <form onSubmit={handleSubmit} style={{ width: '450px' }}>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <TextField
-                                            label="Tên tài liệu"
+                                            label="Tên thiết bị"
                                             type="text"
-                                            name="nameDocument"
-                                            value={formData.nameDocument || ''}
+                                            name="deviceName"
+                                            value={formData.deviceName || ''}
                                             onChange={handleChange}
                                             required
                                             fullWidth
@@ -286,10 +285,10 @@ const Document = () => {
                                     </div>
                                     <div style={{ width: '100%', marginBottom: '30px' }}>
                                         <TextField
-                                            label="Nguồn tài liệu"
+                                            label="Mô tả"
                                             type="text"
-                                            name="Source"
-                                            value={formData.Source || ''}
+                                            name="description"
+                                            value={formData.description || ''}
                                             onChange={handleChange}
                                             required
                                             fullWidth
@@ -302,8 +301,21 @@ const Document = () => {
                                         <TextField
                                             label="Số lượng"
                                             type="number"
-                                            name="NumberOfDocument"
-                                            value={formData.NumberOfDocument || ''}
+                                            name="NumberOfDevice"
+                                            value={formData.NumberOfDevice || ''}
+                                            onChange={handleChange}
+                                            fullWidth
+                                            InputProps={{
+                                                readOnly: isViewMode,
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ width: '100%', marginBottom: '30px' }}>
+                                        <TextField
+                                            label="Chủ sở hữu chính"
+                                            type="text"
+                                            name="mainowner"
+                                            value={formData.mainowner || ''}
                                             onChange={handleChange}
                                             fullWidth
                                             InputProps={{
@@ -335,7 +347,7 @@ const Document = () => {
                         <div className="item">
                             <div className={styles.details}>
                                 <div className={styles.detailItems}>
-                                    <div className="itemKey">Tên tài liệu:</div>
+                                    <div className="itemKey">Tên thiết bị:</div>
                                     <div className="itemValue">
                                         <input
                                             style={{
@@ -349,13 +361,13 @@ const Document = () => {
                                                 marginRight: 30,
                                                 width: 200,
                                             }}
-                                            value={nameDocument}
+                                            value={deviceName}
                                             type="text"
-                                            placeholder="Nhập tên tài liệu"
-                                            onChange={(e) => setNameDocument(e.target.value)}
+                                            placeholder="Nhập tên thiết bị"
+                                            onChange={(e) => setDeviceName(e.target.value)}
                                         />
                                     </div>
-                                    <div className="itemKey">Nguồn tài liệu:</div>
+                                    <div className="itemKey">Mô tả:</div>
                                     <div className="itemValue">
                                         <input
                                             style={{
@@ -369,10 +381,10 @@ const Document = () => {
                                                 marginRight: 30,
                                                 width: 200,
                                             }}
-                                            value={Source}
+                                            value={description}
                                             type="text"
-                                            placeholder="Nhập nguồn tài liệu"
-                                            onChange={(e) => setSource(e.target.value)}
+                                            placeholder="Nhập mô tả"
+                                            onChange={(e) => setDescription(e.target.value)}
                                         />
                                     </div>
 
@@ -394,18 +406,19 @@ const Document = () => {
                                     <TableRow>
                                         <TableCell className={styles.tableCell + ' text-center'}>STT</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>
-                                            Tên tài liệu
+                                            Tên thiết bị
                                         </TableCell>
-                                        <TableCell className={styles.tableCell + ' text-center'}>
-                                            Nguồn tài liệu
-                                        </TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>Mô tả</TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Số lượng</TableCell>
+                                        <TableCell className={styles.tableCell + ' text-center'}>
+                                            Chủ sở hữu chính
+                                        </TableCell>
                                         <TableCell className={styles.tableCell + ' text-center'}>Lựa chọn</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {visibleDocuments?.length > 0 &&
-                                        visibleDocuments?.map((document, index) => (
+                                    {visibleHardwares?.length > 0 &&
+                                        visibleHardwares?.map((hardware, index) => (
                                             <TableRow
                                                 key={index}
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -414,27 +427,30 @@ const Document = () => {
                                                     {index + 1}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
-                                                    {document.nameDocument}
+                                                    {hardware.deviceName}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
-                                                    {document.Source}
+                                                    {hardware.description}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
-                                                    {document.NumberOfDocument}
+                                                    {hardware.NumberOfDevice}
+                                                </TableCell>
+                                                <TableCell className={styles.tableCell + ' text-center'}>
+                                                    {hardware.mainowner}
                                                 </TableCell>
                                                 <TableCell className={styles.tableCell + ' text-center'}>
                                                     <div className={styles.cellAction}>
                                                         {userPosition === 'TRUONG_PHONG' &&
-                                                        userDepartment === 'PHONG_NHAN_SU' ? (
+                                                        userDepartment === 'PHONG_KY_THUAT' ? (
                                                             <>
                                                                 <Button
                                                                     className={styles.editButton}
-                                                                    onClick={() => handleClickOpen('edit', document)}
+                                                                    onClick={() => handleClickOpen('edit', hardware)}
                                                                 >
                                                                     Chỉnh sửa
                                                                 </Button>
                                                                 <Button
-                                                                    onClick={() => handleDelete(document._id)}
+                                                                    onClick={() => handleDelete(hardware._id)}
                                                                     className={styles.deleteButton}
                                                                 >
                                                                     Xóa
@@ -443,7 +459,7 @@ const Document = () => {
                                                         ) : (
                                                             <Button
                                                                 className={styles.viewButton}
-                                                                onClick={() => handleClickOpen('view', document)}
+                                                                onClick={() => handleClickOpen('view', hardware)}
                                                             >
                                                                 Xem chi tiết
                                                             </Button>
@@ -479,4 +495,4 @@ const Document = () => {
     );
 };
 
-export default Document;
+export default Hardware;
