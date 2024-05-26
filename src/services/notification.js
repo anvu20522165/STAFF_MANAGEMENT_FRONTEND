@@ -55,3 +55,23 @@ export const deleteNotification = (id) => {
 export const getNotificationsByUserId = (userId) => {
     return axiosInstance.get(`/notification/user/${userId}`)
 }
+
+/**
+ * get notification count no read
+ *
+ * @param userId
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const getNotificationNoReadCount = (userId) => {
+    return axiosInstance.get(`/notification/user/${userId}/count-no-read`)
+}
+
+/**
+ * call api to mark notification of user
+ *
+ * @param userId
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const markNotificationRead = (userId) => {
+    return axiosInstance.patch(`/notification/mark-read/user/${userId}`)
+}

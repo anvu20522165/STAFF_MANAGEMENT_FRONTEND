@@ -1,15 +1,35 @@
+import React, {useContext, useEffect, useState} from 'react'
 import './navbar.scss';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import { DarkModeContext } from '../../context/darkModeContext';
-import { useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import {DarkModeContext} from '../../context/darkModeContext';
+import {jwtDecode} from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch, useSelector} from "react-redux";
+import {NotificationActionsThunk} from "../../redux-store/reducers/notification";
+
 const Navbar = () => {
-    const { dispatch } = useContext(DarkModeContext);
+    // context
+    const notificationStore = useSelector((state) => state.notification);
+    const {dispatch} = useContext(DarkModeContext);
+
+    // state
     const [username, setUsername] = useState('');
     const [userId, setUserId] = useState();
     const [avt, setAvt] = useState();
+
+    // memo
+    const noReadRead = React.useMemo(() => notificationStore.noReadCount || 0, [notificationStore])
+
+    // redux store
+    const dispatchRedux = useDispatch();
+
+    /**
+     * use initial
+     */
+    React.useEffect(() => {
+        dispatchRedux(NotificationActionsThunk.fetchNoReadCountThunk())
+    }, [dispatchRedux])
 
     //if token is still valid then redirect to home screen
     useEffect(() => {
@@ -31,6 +51,7 @@ const Navbar = () => {
                 console.log('lỗi cmnr');
             }
         }
+
         checkAuth();
     }, []);
     return (
@@ -43,14 +64,20 @@ const Navbar = () => {
                 </div>
                 <div className="items">
                     <div className="item">
-                        <DarkModeOutlinedIcon className="icon" onClick={() => dispatch({ type: 'TOGGLE' })} />
+                        <DarkModeOutlinedIcon className="icon" onClick={() => dispatch({type: 'TOGGLE'})}/>
                     </div>
 
                     <div className="item">
-                        <Link to={`/users/profile/${userId}`} style={{ textDecoration: 'none' }}>
-                            <img src={`${avt}`} alt="" className="avatar" />
+                        <Link to={`/users/profile/${userId}`} style={{textDecoration: 'none'}}>
+                            <div className='position-relative'>
+                                <img src={`${avt}`} alt="" className="avatar"/>
+                                {!!noReadRead && <span
+                                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {noReadRead}
+                                </span>}
+                            </div>
                         </Link>
-                        <div className="listTitle" style={{ marginLeft: '10px' }}>
+                        <div className="listTitle" style={{marginLeft: '10px'}}>
                             Hi, {username}
                         </div>
                     </div>

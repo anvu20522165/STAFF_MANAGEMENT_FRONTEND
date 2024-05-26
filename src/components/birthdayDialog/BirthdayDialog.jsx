@@ -49,7 +49,6 @@ const BirthdayDialog =
             }
         }, [])
 
-
         /**
          * handler ref
          */
@@ -61,13 +60,6 @@ const BirthdayDialog =
                 }
             }
         }))
-
-        /**
-         * initial
-         */
-        React.useEffect(() => {
-            setOpen(props.open)
-        }, [props.open])
 
         return <>
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth>

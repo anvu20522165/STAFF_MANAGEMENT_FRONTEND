@@ -9,12 +9,17 @@ import ActionDialog from "./components/action-dialog";
 import ConfirmDeleteDialog from "./components/confirm-delete-dialog";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {jwtDecode} from "jwt-decode";
+import {useDispatch} from "react-redux";
+import {NotificationActionsThunk} from "../../redux-store/reducers/notification";
 
 const actionAbleRoles = ["TRUONG_PHONG", "CEO"]
 
 const Notification = () => {
     // state user access
     const [userAccess, setUserAccess] = React.useState(null)
+
+    // redux store
+    const dispatchRedux = useDispatch();
 
     // states
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -36,7 +41,6 @@ const Notification = () => {
     // ref
     const deleteConfirmRef = React.useRef({
         open: () => {
-
         }
     })
     const actionDialogRef = React.useRef({
@@ -89,7 +93,8 @@ const Notification = () => {
             default:
                 break
         }
-    }, [])
+        dispatchRedux(NotificationActionsThunk.fetchNoReadCountThunk())
+    }, [dispatchRedux])
 
     /**
      * handle error
