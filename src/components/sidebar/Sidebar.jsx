@@ -7,6 +7,11 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HardwareIcon from '@mui/icons-material/Hardware';
 import DescriptionIcon from '@mui/icons-material/Description';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import RequestPageIcon from '@mui/icons-material/RequestPage';
+import DifferenceIcon from '@mui/icons-material/Difference';
+import MediationIcon from '@mui/icons-material/Mediation';
+import PhoneEnabledIcon from '@mui/icons-material/PhoneEnabled';
 import { Link } from 'react-router-dom';
 import { DarkModeContext } from '../../context/darkModeContext';
 import { useContext } from 'react';
@@ -47,7 +52,7 @@ const Sidebar = () => {
                     <p className="title">Trang Quản Trị</p>
                     <li>
                         <Link to="/notice" style={{ textDecoration: 'none' }}>
-                            <AssignmentIcon className="icon" />
+                            <NotificationsIcon className="icon" />
                             <span>Thông báo</span>
                         </Link>
                     </li>
@@ -71,26 +76,26 @@ const Sidebar = () => {
                     </li>
                     <li>
                         <Link to="/requests" style={{ textDecoration: 'none' }}>
-                            <DescriptionIcon className="icon" />
+                            <RequestPageIcon className="icon" />
                             <span>Yêu cầu</span>
                         </Link>
                     </li>
                     <li>
                         <Link to="/multiTask" style={{ textDecoration: 'none' }}>
-                            <DescriptionIcon className="icon" />
+                            <DifferenceIcon className="icon" />
                             <span>Công việc liên đơn vị</span>
                         </Link>
                     </li>
 
                     <li>
                         <Link to="/structure" style={{ textDecoration: 'none' }}>
-                            <DescriptionIcon className="icon" />
+                            <MediationIcon className="icon" />
                             <span>Cơ cấu</span>
                         </Link>
                     </li>
                     <li>
                         <Link to="/contact" style={{ textDecoration: 'none' }}>
-                            <DescriptionIcon className="icon" />
+                            <PhoneEnabledIcon className="icon" />
                             <span>Liên hệ</span>
                         </Link>
                     </li>
